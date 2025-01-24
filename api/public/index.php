@@ -1,8 +1,7 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '../../vendor/autoload.php';
 
-// Carregar as rotas
-$app = require __DIR__ . '/../routes/web.php';
+$app = require __DIR__ . '../../src/Routes/web.php';
 
 $app->run();
