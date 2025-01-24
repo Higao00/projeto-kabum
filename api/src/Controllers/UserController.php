@@ -2,73 +2,95 @@
 
 namespace App\Controllers;
 
-
 use App\Models\ModelsUser;
-use \Firebase\JWT\JWT;
-
+use Firebase\JWT\JWT;
 
 class UserController
 {
-    private $pdo;
     private $userModel;
     private $secretKey = 'your_secret_key'; // Chave secreta para assinar o JWT
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->userModel = new ModelsUser($this->pdo);
+
+        $this->userModel = new ModelsUser();
     }
 
     // Registrar usuário
     public function register($request, $response, $args)
     {
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents(), true);
 
-        $name = $data['name'];
-        $email = $data['email'];
-        $password = $data['password'];
-        $status = $data['status'];
+        $name = $data['name'] ?? null;
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+        $status = $data['status'] ?? null;
 
-        if (empty($name) || empty($email) || empty($password) || empty($status)) {
-            return $response->withJson(['error' => 'Missing required fields'], 400);
+        try {
+            // Criar o usuário e obter os dados do usuário criado
+            $createdUser = $this->userModel->createUser($name, $email, $password, $status);
+
+            $response->getBody()->write(json_encode([
+                'message' => 'User created successfully',
+                'user' => $createdUser
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
-
-        $this->userModel->createUser($name, $email, $password, $status);
-
-        return $response->withJson(['message' => 'User created successfully'], 201);
     }
 
     // Login de usuário
     public function login($request, $response, $args)
     {
-        $data = $request->getParsedBody();
-        $email = $data['email'];
-        $password = $data['password'];
+        $data = json_decode($request->getBody()->getContents(), true);
 
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+
+        // Validação inicial: Verificar se os campos obrigatórios estão presentes
+        if (empty($email) || empty($password)) {
+            $response->getBody()->write(json_encode(['error' => 'Email and password are required']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Recupera o usuário do banco de dados com base no email
         $user = $this->userModel->getUserByEmail($email);
 
+        // Verifica se o usuário não existe ou a senha não é válida
         if (!$user || !password_verify($password, $user['password'])) {
-            return $response->withJson(['error' => 'Invalid credentials'], 401);
+            $response->getBody()->write(json_encode(['error' => 'Invalid credentials']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
+
+        // Remove a senha do retorno para segurança
+        unset($user['password']);
 
         // Gerar o JWT
         $issuedAt = time();
-        $expirationTime = $issuedAt + 3600;  // Expira em 1 hora a partir de agora
+        $expirationTime = $issuedAt + 3600; // Expira em 1 hora
         $payload = [
-            'iat' => $issuedAt,  // Hora de emissão
-            'exp' => $expirationTime,  // Hora de expiração
-            'sub' => $user['id'],  // ID do usuário, por exemplo
-            'email' => $user['email'], // Outros dados que podem ser úteis no payload
+            'iat' => $issuedAt,
+            'exp' => $expirationTime,
+            'sub' => $user['id'], // ID do usuário como identificador
+            'email' => $user['email'],
         ];
 
-        // Assinar o JWT com a chave secreta
         $jwt = JWT::encode($payload, $this->secretKey, 'HS256');
 
-        return $response->withJson([
+        // Retorna a resposta com os dados do usuário e o token
+        $response->getBody()->write(json_encode([
             'message' => 'Login successful',
-            'user' => $user,
-            'token' => $jwt,  // Retorna o JWT
-        ], 200);
+            'user' => [
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'status' => $user['status'], // Incluindo status, se relevante
+            ],
+            'token' => $jwt,
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Obter todos os usuários
@@ -77,11 +99,13 @@ class UserController
         $users = $this->userModel->getAllUsers();
         $userArray = [];
 
-        while ($user = $users->fetch()) {
+        while ($user = $users->fetch(\PDO::FETCH_ASSOC)) {
+            unset($user['password']); // Remove a senha para maior segurança
             $userArray[] = $user;
         }
 
-        return $response->withJson($userArray, 200);
+        $response->getBody()->write(json_encode($userArray));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Obter usuário por ID
@@ -91,31 +115,65 @@ class UserController
         $user = $this->userModel->getUserById($id);
 
         if (!$user) {
-            return $response->withJson(['error' => 'User not found'], 404);
+            $response->getBody()->write(json_encode(['error' => 'User not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        return $response->withJson($user, 200);
+        // Certifique-se de remover a senha antes de retornar os dados
+        unset($user['password']);
+
+        // Aqui verificamos se o retorno possui chaves numéricas e substituímos por nomes esperados
+        $user = array_filter($user, function ($key) {
+            return !is_numeric($key);  // Filtrando chaves numéricas
+        }, ARRAY_FILTER_USE_KEY);
+
+        $response->getBody()->write(json_encode($user));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Atualizar usuário
     public function updateUser($request, $response, $args)
     {
         $id = $args['id'];
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents(), true);
 
-        $name = $data['name'];
-        $email = $data['email'];
-        $password = $data['password'];
-        $status = $data['status'];
+        $name = $data['name'] ?? null;
+        $email = $data['email'] ?? null;
+        $status = isset($data['status']) ? (int)$data['status'] : null;
 
-        if (empty($name) || empty($email) || empty($password) || empty($status)) {
-            return $response->withJson(['error' => 'Missing required fields'], 400);
+        // Impedir alterações no admin (ID 1)
+        if ($id == 1) {
+            $response->getBody()->write(json_encode(['error' => 'It is not possible to change the admin']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
-        $this->userModel->updateUser($id, $name, $email, $password, $status);
+        // Verificar se o usuário existe antes da atualização
+        $user = $this->userModel->getUserById($id);
 
-        return $response->withJson(['message' => 'User updated successfully'], 200);
+        if (!$user) {
+            $response->getBody()->write(json_encode(['error' => 'User not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        // Atualizar o usuário
+        $this->userModel->updateUser($id, $name, $email, $status);
+
+        // Buscar os dados atualizados do usuário
+        $updatedUser = $this->userModel->getUserById($id);
+
+        // Garantir que a senha não seja retornada
+        unset($updatedUser['password']);
+
+        // Retornar o objeto atualizado
+        $response->getBody()->write(json_encode([
+            'message' => 'User updated successfully',
+            'user' => $updatedUser,
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
+
+
 
     // Excluir usuário
     public function deleteUser($request, $response, $args)
@@ -123,12 +181,19 @@ class UserController
         $id = $args['id'];
         $user = $this->userModel->getUserById($id);
 
+        if ($id == 1) {
+            $response->getBody()->write(json_encode(['error' => 'Unable to remove admin']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
         if (!$user) {
-            return $response->withJson(['error' => 'User not found'], 404);
+            $response->getBody()->write(json_encode(['error' => 'User not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
         $this->userModel->deleteUser($id);
 
-        return $response->withJson(['message' => 'User deleted successfully'], 200);
+        $response->getBody()->write(json_encode(['message' => 'User deleted successfully']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 }

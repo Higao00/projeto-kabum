@@ -29,9 +29,6 @@ class Database
             // Criar a conexão PDO
             $this->connection = new PDO($dsn, $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD']);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Exibir uma mensagem de sucesso no console
-            echo "Conexão com o banco de dados estabelecida com sucesso!\n";
         } catch (PDOException $e) {
             // Se ocorrer um erro, mostrar a mensagem de erro
             echo "Erro ao conectar com o banco de dados: " . $e->getMessage();
