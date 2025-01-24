@@ -1,6 +1,8 @@
 <?php
 // /migrate.php
 
+use App\Config\Database;
+
 require 'vendor/autoload.php';
 require 'config/Database.php';
 
