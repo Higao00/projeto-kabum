@@ -1,0 +1,18 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^5.4",
+        "slim/slim": "4.*",
+        "illuminate/database": "^8.0",
+        "illuminate/filesystem": "^8.0"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require-dev": {
+        "robmorgan/phinx": "^0.14.0"
+    },
+    "autoload": {
+        "classmap": [
+            "database/migrations"
+        ]
+    }
+}

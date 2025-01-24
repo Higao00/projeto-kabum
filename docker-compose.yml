@@ -1,0 +1,81 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-network
+    depends_on:
+      - php-api
+      - frontend
+
+  php-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: php-api
+    expose:
+      - '80' # Expondo internamente para o Nginx
+
+    env_file:
+      - .env # Carrega variáveis do .env
+
+    volumes:
+      - ./api:/var/www/html # Mapeia o projeto para o container
+      - ./.env:/var/www/html/.env # Copia o arquivo .env para o diretório correto
+
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: next-frontend
+    ports:
+      - '3000:3000' # Expondo a porta 3000 para o host
+    networks:
+      - app-network
+    depends_on:
+      - php-api
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - '3306:3306'
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: kabum
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql-db
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - '8080:80'
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
