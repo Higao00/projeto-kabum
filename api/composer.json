@@ -1,9 +1,7 @@
 {
     "require": {
         "vlucas/phpdotenv": "^5.4",
-        "slim/slim": "4.*",
-        "illuminate/database": "^8.0",
-        "illuminate/filesystem": "^8.0"
+        "slim/slim": "4.*"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
