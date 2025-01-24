@@ -25,7 +25,7 @@ try {
 
         $migration = new $className();
 
-        // echo "Executando migração: $className\n";
+        echo "Executando migração: $className\n";
 
         // Adiciona um var_dump para garantir que está sendo executado
         var_dump($migration);

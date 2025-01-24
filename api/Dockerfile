@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    git \
     && docker-php-ext-install zip mysqli pdo pdo_mysql \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
@@ -15,16 +16,16 @@ RUN apt-get update && apt-get install -y \
 # Copiar o Composer para o container
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Copiar os arquivos do projeto
-COPY . /var/www/html
-
 # Definir o diretório de trabalho
 WORKDIR /var/www/html
+
+# Copiar os arquivos do projeto
+COPY . /var/www/html
 
 # Definir as permissões corretas
 RUN chown -R www-data:www-data /var/www/html
 
-# Expor a porta 9000 para o FPM
+# Expor a porta 9000 para o PHP-FPM
 EXPOSE 9000
 
 # Iniciar o PHP-FPM
