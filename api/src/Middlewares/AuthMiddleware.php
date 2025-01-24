@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AuthMiddleware;
+namespace App\Middlewares;
 
 use Firebase\JWT\JWT;
 use Psr\Http\Message\ServerRequestInterface as Request;

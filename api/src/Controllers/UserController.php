@@ -1,11 +1,11 @@
 <?php
 
-namespace App\UserController;
+namespace App\Controllers;
 
-require_once '../models/User.php';
 
+use App\Models\ModelsUser;
 use \Firebase\JWT\JWT;
-use User;
+
 
 class UserController
 {
@@ -16,7 +16,7 @@ class UserController
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-        $this->userModel = new User($this->pdo);
+        $this->userModel = new ModelsUser($this->pdo);
     }
 
     // Registrar usuário

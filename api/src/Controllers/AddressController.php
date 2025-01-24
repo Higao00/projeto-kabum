@@ -1,10 +1,8 @@
 <?php
 
-namespace App\AddressController;
+namespace App\Controllers;
 
-use Address;
-
-require_once '../models/Address.php';
+use App\Models\ModelsAddress;
 
 class AddressController
 {
@@ -14,7 +12,7 @@ class AddressController
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-        $this->addressModel = new Address($this->pdo);
+        $this->addressModel = new ModelsAddress($this->pdo);
     }
 
     // Criar endereço

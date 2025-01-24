@@ -1,6 +1,6 @@
 <?php
 
-namespace App\UserValidationMiddleware;
+namespace App\Middlewares;
 
 class UserValidationMiddleware
 {

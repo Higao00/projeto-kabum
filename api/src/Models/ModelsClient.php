@@ -1,6 +1,8 @@
 <?php
 
-class Client
+namespace App\Models;
+
+class ModelsClient
 {
     private $pdo;
 

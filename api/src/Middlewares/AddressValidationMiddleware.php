@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AddressValidationMiddleware;
+namespace App\Middlewares;
 
 class AddressValidationMiddleware
 {

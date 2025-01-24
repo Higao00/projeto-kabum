@@ -1,6 +1,8 @@
 <?php
 
-class Address
+namespace App\Models;
+
+class ModelsAddress
 {
     private $pdo;
 

@@ -26,6 +26,8 @@ services:
     volumes:
       - ./api:/var/www/html # Mapeia o projeto para o container
       - ./.env:/var/www/html/.env # Copia o arquivo .env para o diretório correto
+      - ./api/vendor:/var/www/html/vendor
+      - ./api/composer.json:/var/www/html/composer.json
 
     networks:
       - app-network

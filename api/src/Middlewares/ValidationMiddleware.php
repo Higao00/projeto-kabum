@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ValidationMiddleware;
+namespace App\Middlewares;
 
 class ValidationMiddleware
 {

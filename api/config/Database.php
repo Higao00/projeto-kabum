@@ -1,6 +1,12 @@
 <?php
 // /config/Database.php
 
+namespace App\Config;
+
+use PDO;
+use Dotenv\Dotenv;
+use PDOException;
+
 class Database
 {
     private ?PDO $connection = null;
@@ -8,7 +14,7 @@ class Database
     public function __construct()
     {
         // Carregar variáveis de ambiente
-        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->load();
 
         // Configurar a string DSN para a conexão

@@ -1,10 +1,8 @@
 <?php
 
-namespace App\ClientController;
+namespace App\Controllers;
 
-use Client;
-
-require_once '../models/Client.php';
+use App\Models\ModelsClient;
 
 class ClientController
 {
@@ -14,7 +12,7 @@ class ClientController
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-        $this->clientModel = new Client($this->pdo);
+        $this->clientModel = new ModelsClient($this->pdo);
     }
 
     // Registrar cliente
