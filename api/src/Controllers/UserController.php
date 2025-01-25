@@ -90,7 +90,7 @@ class UserController
             ],
             'token' => $jwt,
         ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
     }
 
     // Obter todos os usuários

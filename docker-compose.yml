@@ -42,11 +42,18 @@ services:
       dockerfile: Dockerfile
     container_name: next-frontend
     ports:
-      - '3000:3000' # Expondo a porta 3000 para o host
+      - '3000:3000' # Porta exposta
     networks:
       - app-network
     depends_on:
       - php-api
+    volumes:
+      - ./frontend:/usr/src/app # Volume para mapear o código local para o container
+      - /usr/src/app/node_modules # Evita sobrescrever a pasta node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true" # Força o hot reload no Docker
+    command: "npm run dev" # Inicia o servidor de desenvolvimento
+
 
   db:
     image: mysql:8.0
