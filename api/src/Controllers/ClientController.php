@@ -6,46 +6,53 @@ use App\Models\ModelsClient;
 
 class ClientController
 {
-    private $pdo;
     private $clientModel;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->clientModel = new ModelsClient($this->pdo);
+        $this->clientModel = new ModelsClient();
     }
 
     // Registrar cliente
     public function register($request, $response, $args)
     {
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents(), true);
 
-        $name = $data['name'];
-        $dob = $data['dob'];
-        $cpf = $data['cpf'];
-        $rg = $data['rg'];
-        $phone = $data['phone'];
+        $name = $data['name'] ?? null;
+        $dob = $data['dob'] ?? null;
+        $cpf = $data['cpf'] ?? null;
+        $rg = $data['rg'] ?? null;
+        $phone = $data['phone'] ?? null;
 
-        if (empty($name) || empty($dob) || empty($cpf) || empty($rg) || empty($phone)) {
-            return $response->withJson(['error' => 'Missing required fields'], 400);
+        try {
+            if (empty($name) || empty($dob) || empty($cpf) || empty($rg) || empty($phone)) {
+                throw new \Exception('Missing required fields');
+            }
+
+            // Criar o cliente
+            $createdClient = $this->clientModel->createClient($name, $dob, $cpf, $rg, $phone);
+
+            // Obter os dados completos do cliente criado
+            $fullClientData = $this->clientModel->getClientById($createdClient['id']);
+
+            $response->getBody()->write(json_encode([
+                'message' => 'Client created successfully',
+                'client' => $fullClientData
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
-
-        $this->clientModel->createClient($name, $dob, $cpf, $rg, $phone);
-
-        return $response->withJson(['message' => 'Client created successfully'], 201);
     }
 
     // Obter todos os clientes
     public function getAllClients($request, $response, $args)
     {
         $clients = $this->clientModel->getAllClients();
-        $clientArray = [];
 
-        while ($client = $clients->fetch()) {
-            $clientArray[] = $client;
-        }
-
-        return $response->withJson($clientArray, 200);
+        $response->getBody()->write(json_encode($clients));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Obter cliente por ID
@@ -55,31 +62,49 @@ class ClientController
         $client = $this->clientModel->getClientById($id);
 
         if (!$client) {
-            return $response->withJson(['error' => 'Client not found'], 404);
+            $response->getBody()->write(json_encode(['error' => 'Client not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        return $response->withJson($client, 200);
+        $response->getBody()->write(json_encode($client));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Atualizar cliente
     public function updateClient($request, $response, $args)
     {
         $id = $args['id'];
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents(), true);
 
-        $name = $data['name'];
-        $dob = $data['dob'];
-        $cpf = $data['cpf'];
-        $rg = $data['rg'];
-        $phone = $data['phone'];
+        $name = $data['name'] ?? null;
+        $dob = $data['dob'] ?? null;
+        $cpf = $data['cpf'] ?? null;
+        $rg = $data['rg'] ?? null;
+        $phone = $data['phone'] ?? null;
 
-        if (empty($name) || empty($dob) || empty($cpf) || empty($rg) || empty($phone)) {
-            return $response->withJson(['error' => 'Missing required fields'], 400);
+        $client = $this->clientModel->getClientById($id);
+
+        if (!$client) {
+            $response->getBody()->write(json_encode(['error' => 'Client not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        $this->clientModel->updateClient($id, $name, $dob, $cpf, $rg, $phone);
+        try {
+            // Atualizar o cliente
+            $this->clientModel->updateClient($id, $name, $dob, $cpf, $rg, $phone);
 
-        return $response->withJson(['message' => 'Client updated successfully'], 200);
+            // Buscar os dados atualizados do cliente
+            $updatedClient = $this->clientModel->getClientById($id);
+
+            $response->getBody()->write(json_encode([
+                'message' => 'Client updated successfully',
+                'client' => $updatedClient,
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
     }
 
     // Excluir cliente
@@ -89,11 +114,13 @@ class ClientController
         $client = $this->clientModel->getClientById($id);
 
         if (!$client) {
-            return $response->withJson(['error' => 'Client not found'], 404);
+            $response->getBody()->write(json_encode(['error' => 'Client not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
         $this->clientModel->deleteClient($id);
 
-        return $response->withJson(['message' => 'Client deleted successfully'], 200);
+        $response->getBody()->write(json_encode(['message' => 'Client deleted successfully']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 }

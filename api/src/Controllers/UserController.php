@@ -69,7 +69,7 @@ class UserController
 
         // Gerar o JWT
         $issuedAt = time();
-        $expirationTime = $issuedAt + 3600; // Expira em 1 hora
+        $expirationTime = $issuedAt + 360000; // Expira em 1 hora
         $payload = [
             'iat' => $issuedAt,
             'exp' => $expirationTime,
