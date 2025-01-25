@@ -6,85 +6,138 @@ use App\Models\ModelsAddress;
 
 class AddressController
 {
-    private $pdo;
     private $addressModel;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->addressModel = new ModelsAddress($this->pdo);
+        $this->addressModel = new ModelsAddress();
     }
 
     // Criar endereço
     public function createAddress($request, $response, $args)
     {
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents(), true);
 
-        $client_id = $data['client_id'];
-        $cep = $data['cep'];
-        $logradouro = $data['logradouro'];
-        $bairro = $data['bairro'];
-        $localidade = $data['localidade'];
-        $cidade = $data['cidade'];
-        $uf = $data['uf'];
+        $client_id = $data['client_id'] ?? null;
+        $postal_code = $data['postal_code'] ?? null;
+        $street = $data['street'] ?? null;
+        $neighborhood = $data['neighborhood'] ?? null;
+        $locality = $data['locality'] ?? null;
+        $city = $data['city'] ?? null;
+        $state = $data['state'] ?? null;
 
-        if (empty($client_id) || empty($cep) || empty($logradouro) || empty($bairro) || empty($localidade) || empty($cidade) || empty($uf)) {
-            return $response->withJson(['error' => 'Missing required fields'], 400);
+        try {
+            if (empty($client_id) || empty($postal_code) || empty($street) || empty($neighborhood) || empty($locality) || empty($city) || empty($state)) {
+                throw new \Exception('Missing required fields');
+            }
+
+            // Criar o endereço
+            $createdAddress = $this->addressModel->createAddress($client_id, $postal_code, $street, $neighborhood, $locality, $city, $state);
+
+            $response->getBody()->write(json_encode([
+                'message' => 'Address created successfully',
+                'address' => $createdAddress
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+    }
+
+    public function getAllAddresses($request, $response, $args)
+    {
+        $addresses = $this->addressModel->getAllAddresses();
+
+        // Verificar se existem endereços
+        if (!$addresses) {
+            $response->getBody()->write(json_encode(['error' => 'No addresses found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        $this->addressModel->createAddress($client_id, $cep, $logradouro, $bairro, $localidade, $cidade, $uf);
-
-        return $response->withJson(['message' => 'Address created successfully'], 201);
+        // Retorna todos os endereços
+        $response->getBody()->write(json_encode($addresses));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Obter endereços por ID do cliente
     public function getAddressesByClientId($request, $response, $args)
     {
-        $clientId = $args['client_id'];
+        $clientId = $args['id'];
         $addresses = $this->addressModel->getAddressesByClientId($clientId);
 
-        $addressArray = [];
-        while ($address = $addresses->fetch()) {
-            $addressArray[] = $address;
+        if (!$addresses) {
+            $response->getBody()->write(json_encode(['error' => 'No addresses found for this client']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        return $response->withJson($addressArray, 200);
+        $response->getBody()->write(json_encode($addresses));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    }
+
+    public function getAddressById($request, $response, $args)
+    {
+        $clientId = $args['id'];
+        $addresses = $this->addressModel->getAddressById($clientId);
+
+        if (!$addresses) {
+            $response->getBody()->write(json_encode(['error' => 'No addresses found for this id']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        $response->getBody()->write(json_encode($addresses));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     // Atualizar endereço
     public function updateAddress($request, $response, $args)
     {
         $id = $args['id'];
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents(), true);
 
-        $cep = $data['cep'];
-        $logradouro = $data['logradouro'];
-        $bairro = $data['bairro'];
-        $localidade = $data['localidade'];
-        $cidade = $data['cidade'];
-        $uf = $data['uf'];
+        $postal_code = $data['postal_code'] ?? null;
+        $street = $data['street'] ?? null;
+        $neighborhood = $data['neighborhood'] ?? null;
+        $locality = $data['locality'] ?? null;
+        $city = $data['city'] ?? null;
+        $state = $data['state'] ?? null;
 
-        if (empty($cep) || empty($logradouro) || empty($bairro) || empty($localidade) || empty($cidade) || empty($uf)) {
-            return $response->withJson(['error' => 'Missing required fields'], 400);
+        try {
+            if (empty($postal_code) || empty($street) || empty($neighborhood) || empty($locality) || empty($city) || empty($state)) {
+                throw new \Exception('Missing required fields');
+            }
+
+            // Atualizar o endereço
+            $this->addressModel->updateAddress($id, $postal_code, $street, $neighborhood, $locality, $city, $state);
+
+            // Obter os dados atualizados do endereço
+            $updatedAddress = $this->addressModel->getAddressById($id);
+
+            $response->getBody()->write(json_encode([
+                'message' => 'Address updated successfully',
+                'address' => $updatedAddress,
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
-
-        $this->addressModel->updateAddress($id, $cep, $logradouro, $bairro, $localidade, $cidade, $uf);
-
-        return $response->withJson(['message' => 'Address updated successfully'], 200);
     }
 
     // Excluir endereço
     public function deleteAddress($request, $response, $args)
     {
         $id = $args['id'];
-        $address = $this->addressModel->getAddressesByClientId($id);
+        $address = $this->addressModel->getAddressById($id);
 
         if (!$address) {
-            return $response->withJson(['error' => 'Address not found'], 404);
+            $response->getBody()->write(json_encode(['error' => 'Address not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
         $this->addressModel->deleteAddress($id);
 
-        return $response->withJson(['message' => 'Address deleted successfully'], 200);
+        $response->getBody()->write(json_encode(['message' => 'Address deleted successfully']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 }

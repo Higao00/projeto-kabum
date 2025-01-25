@@ -1,7 +1,9 @@
 <?php
 
+use App\Controllers\AddressController;
 use App\Controllers\ClientController;
 use App\Controllers\UserController;
+use App\Middlewares\AddressValidationMiddleware;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\ClientValidationMiddleware;
 use App\Middlewares\ErrorHandlerMiddleware;
@@ -74,6 +76,38 @@ $app->group('/api/clients', function (RouteCollectorProxy $group) {
     $group->delete('/{id}', function ($request, $response, array $args) {
         $clientController = new ClientController();
         return $clientController->deleteClient($request, $response, $args);
+    });
+})->add(new AuthMiddleware());
+
+$app->group('/api/address', function (RouteCollectorProxy $group) {
+    $group->post('/create', function ($request, $response, array $args) {
+        $addressController = new AddressController();
+        return $addressController->createAddress($request, $response, $args);
+    })->add(new AddressValidationMiddleware());
+
+    $group->get('/all', function ($request, $response, array $args) {
+        $addressController = new AddressController();
+        return $addressController->getAllAddresses($request, $response, $args);
+    });
+
+    $group->put('/{id}', function ($request, $response, array $args) {
+        $addressController = new AddressController();
+        return $addressController->updateAddress($request, $response, $args);
+    })->add(new AddressValidationMiddleware());
+
+    $group->get('/clientID/{id}', function ($request, $response, array $args) {
+        $addressController = new AddressController();
+        return $addressController->getAddressesByClientId($request, $response, $args);
+    });
+
+    $group->get('/{id}', function ($request, $response, array $args) {
+        $addressController = new AddressController();
+        return $addressController->getAddressById($request, $response, $args);
+    });
+
+    $group->delete('/{id}', function ($request, $response, array $args) {
+        $addressController = new AddressController();
+        return $addressController->deleteAddress($request, $response, $args);
     });
 })->add(new AuthMiddleware());
 
