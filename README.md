@@ -25,10 +25,6 @@ Siga os passos abaixo para configurar e executar o projeto:
 git clone https://github.com/Higao00/projeto-kabum.git
 ```
 
-```bash
-cd projeto-kabum
-```
-
 ### 1. Instalação das dependencias
 
 ```bash
@@ -43,6 +39,10 @@ npm install
 ### 2. Suba os Contêineres com Docker Compose
 
 Execute o comando abaixo para iniciar os contêineres:
+
+```bash
+cd ..
+```
 
 ```bash
 docker-compose up -d
