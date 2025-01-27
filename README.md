@@ -51,7 +51,8 @@ Este comando irá:
 
 ### 3. Execute as Migrações do Banco de Dados
 
-Após os contêineres estarem em execução, execute o comando abaixo para aplicar as migrações do banco de dados:
+Após os contêineres estarem em execução, execute o comando abaixo para aplicar as migrações do banco de dados: 
+(Caso ocorra um erro, pode ser que o banco de dados ainda não esteja disponível. Aguarde alguns instantes e tente novamente)
 
 ```bash
 docker exec -it php-api php migrate.php
