@@ -17,11 +17,10 @@ class ValidationMiddleware
 
         foreach ($this->fields as $field) {
             if (empty($data[$field])) {
-                return $response->withJson(['message' => "Field '$field' is required"], 400);
+                return $response->withJson(['message' => "O campo '$field' é obrigatório"], 400);
             }
         }
 
-        // Continua para o próximo middleware ou controlador
         $response = $next($request, $response);
 
         return $response;

@@ -291,13 +291,11 @@ const Address = () => {
                     setValue("postal_code", '');
                     setValue("city", '');
                     setValue("locality", '');
-                    setValue("neighborhood", '');
                     setValue("state", '');
                     setValue("street", '');
                 } else {
                     setValue("city", data.localidade);
                     setValue("locality", data.bairro);
-                    setValue("neighborhood", data.bairro);
                     setValue("state", data.uf);
                     setValue("street", data.logradouro);
                 }
@@ -459,7 +457,7 @@ const Address = () => {
                                 <small className="p-error">{errors.neighborhood.message}</small>
                             ) : (
                                 <label className={classNames({ "p-error": errors.neighborhood }) + " label-input-login"} htmlFor="neighborhood">
-                                    vizinhança*
+                                    Número / Complemento*
                                 </label>
                             )}
 
@@ -467,7 +465,7 @@ const Address = () => {
                                 name="neighborhood"
                                 control={control}
                                 rules={{
-                                    required: "Vizinhança é obrigatorio.",
+                                    required: "Número é obrigatorio.",
                                 }}
                                 render={({ field }) => <S.InputTextLogin type="text" id={field.name} {...field} />}
                             />
@@ -628,7 +626,7 @@ const Address = () => {
                                 <small className="p-error">{errors.neighborhood.message}</small>
                             ) : (
                                 <label className={classNames({ "p-error": errors.neighborhood }) + " label-input-login"} htmlFor="neighborhood">
-                                    vizinhança*
+                                    Número / Complemento*
                                 </label>
                             )}
 
@@ -636,7 +634,7 @@ const Address = () => {
                                 name="neighborhood"
                                 control={control}
                                 rules={{
-                                    required: "Vizinhança é obrigatorio.",
+                                    required: "Número é obrigatorio.",
                                 }}
                                 render={({ field }) => <S.InputTextLogin type="text" id={field.name} {...field} />}
                             />

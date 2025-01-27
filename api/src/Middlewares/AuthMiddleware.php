@@ -20,12 +20,11 @@ class AuthMiddleware implements MiddlewareInterface
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        // Verifica se o cabeçalho de autorização está presente
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!$authHeader) {
             $response = new \Slim\Psr7\Response();
-            $response->getBody()->write(json_encode(['error' => 'Authorization header not found']));
+            $response->getBody()->write(json_encode(['error' => 'Cabeçalho de autorização não encontrado.']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
 
@@ -33,33 +32,29 @@ class AuthMiddleware implements MiddlewareInterface
 
         if (count($arr) != 2) {
             $response = new \Slim\Psr7\Response();
-            $response->getBody()->write(json_encode(['error' => 'Authorization header malformed']));
+            $response->getBody()->write(json_encode(['error' => 'Cabeçalho de autorização malformado.']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
 
-        $jwt = $arr[1]; // Obtém o token JWT
+        $jwt = $arr[1];
 
         try {
-            // Decodifica o JWT
             $decoded = JWT::decode($jwt, new Key($this->secretKey, 'HS256'));
-
-            // Adiciona os dados do usuário ao request
             $request = $request->withAttribute('user', $decoded);
         } catch (\Firebase\JWT\ExpiredException $e) {
             $response = new \Slim\Psr7\Response();
-            $response->getBody()->write(json_encode(['error' => 'Token expired']));
+            $response->getBody()->write(json_encode(['error' => 'Token expirado.']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         } catch (\Firebase\JWT\SignatureInvalidException $e) {
             $response = new \Slim\Psr7\Response();
-            $response->getBody()->write(json_encode(['error' => 'Invalid token signature']));
+            $response->getBody()->write(json_encode(['error' => 'Assinatura do token inválida.']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         } catch (\Exception $e) {
             $response = new \Slim\Psr7\Response();
-            $response->getBody()->write(json_encode(['error' => 'Invalid or malformed token']));
+            $response->getBody()->write(json_encode(['error' => 'Token inválido ou malformado.']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
 
-        // Continua para o próximo middleware ou controlador
         return $handler->handle($request);
     }
 }

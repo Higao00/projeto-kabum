@@ -13,7 +13,6 @@ class AddressController
         $this->addressModel = new ModelsAddress();
     }
 
-    // Criar endereço
     public function createAddress($request, $response, $args)
     {
         $data = json_decode($request->getBody()->getContents(), true);
@@ -28,10 +27,9 @@ class AddressController
 
         try {
             if (empty($client_id) || empty($postal_code) || empty($street) || empty($neighborhood) || empty($locality) || empty($city) || empty($state)) {
-                throw new \Exception('Missing required fields');
+                throw new \Exception('Campos obrigatórios faltando');
             }
 
-            // Criar o endereço
             $createdAddress = $this->addressModel->createAddress($client_id, $postal_code, $street, $neighborhood, $locality, $city, $state);
 
             $response->getBody()->write(json_encode($createdAddress));
@@ -46,25 +44,22 @@ class AddressController
     {
         $addresses = $this->addressModel->getAllAddresses();
 
-        // Verificar se existem endereços
         if (!$addresses) {
-            $response->getBody()->write(json_encode(['message' => 'No addresses found']));
+            $response->getBody()->write(json_encode(['message' => 'Nenhum endereço encontrado']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        // Retorna todos os endereços
         $response->getBody()->write(json_encode($addresses));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    // Obter endereços por ID do cliente
     public function getAddressesByClientId($request, $response, $args)
     {
         $clientId = $args['id'];
         $addresses = $this->addressModel->getAddressesByClientId($clientId);
 
         if (!$addresses) {
-            $response->getBody()->write(json_encode(['message' => 'No addresses found for this client']));
+            $response->getBody()->write(json_encode(['message' => 'Nenhum endereço encontrado para este cliente']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -78,7 +73,7 @@ class AddressController
         $addresses = $this->addressModel->getAddressById($clientId);
 
         if (!$addresses) {
-            $response->getBody()->write(json_encode(['message' => 'No addresses found for this id']));
+            $response->getBody()->write(json_encode(['message' => 'Nenhum endereço encontrado para este ID']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -86,7 +81,6 @@ class AddressController
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    // Atualizar endereço
     public function updateAddress($request, $response, $args)
     {
         $id = $args['id'];
@@ -100,15 +94,13 @@ class AddressController
         $state = $data['state'] ?? null;
 
         try {
-            // Obter o cliente associado ao endereço
             $currentAddress = $this->addressModel->getAddressById($id);
             if (!$currentAddress) {
-                throw new \Exception('Address not found');
+                throw new \Exception('Endereço não encontrado');
             }
 
             $clientId = $currentAddress['client_id'];
 
-            // Verificar duplicidade de endereço, ignorando o endereço atual
             $existingAddress = $this->addressModel->findDuplicateAddressExcludingCurrent(
                 $postal_code,
                 $street,
@@ -121,13 +113,11 @@ class AddressController
             );
 
             if ($existingAddress) {
-                throw new \Exception('Address already exists for another client');
+                throw new \Exception('Endereço já existe para outro cliente');
             }
 
-            // Atualizar o endereço
             $this->addressModel->updateAddress($id, $postal_code, $street, $neighborhood, $locality, $city, $state);
 
-            // Obter os dados atualizados do endereço
             $updatedAddress = $this->addressModel->getAddressById($id);
 
             $response->getBody()->write(json_encode($updatedAddress));
@@ -138,22 +128,19 @@ class AddressController
         }
     }
 
-
-
-    // Excluir endereço
     public function deleteAddress($request, $response, $args)
     {
         $id = $args['id'];
         $address = $this->addressModel->getAddressById($id);
 
         if (!$address) {
-            $response->getBody()->write(json_encode(['message' => 'Address not found']));
+            $response->getBody()->write(json_encode(['message' => 'Endereço não encontrado']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
         $this->addressModel->deleteAddress($id);
 
-        $response->getBody()->write(json_encode(['message' => 'Address deleted successfully']));
+        $response->getBody()->write(json_encode(['message' => 'Endereço excluído com sucesso']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 }

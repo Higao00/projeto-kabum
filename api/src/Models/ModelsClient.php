@@ -16,7 +16,6 @@ class ModelsClient
         $this->pdo = $database->getConnection();
     }
 
-    // Criar cliente
     public function createClient($name, $dob, $cpf, $rg, $phone)
     {
         try {
@@ -32,11 +31,10 @@ class ModelsClient
 
             return ['id' => $this->pdo->lastInsertId()];
         } catch (PDOException $e) {
-            throw new \Exception("Error creating client: " . $e->getMessage());
+            throw new \Exception("Erro ao criar cliente: " . $e->getMessage());
         }
     }
 
-    // Obter cliente por ID
     public function getClientById($id)
     {
         try {
@@ -45,11 +43,10 @@ class ModelsClient
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new \Exception("Error fetching client: " . $e->getMessage());
+            throw new \Exception("Erro ao buscar cliente: " . $e->getMessage());
         }
     }
 
-    // Obter todos os clientes
     public function getAllClients()
     {
         try {
@@ -57,11 +54,10 @@ class ModelsClient
             $stmt = $this->pdo->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new \Exception("Error fetching clients: " . $e->getMessage());
+            throw new \Exception("Erro ao buscar clientes: " . $e->getMessage());
         }
     }
 
-    // Atualizar cliente
     public function updateClient($id, $name, $dob, $cpf, $rg, $phone)
     {
         try {
@@ -69,11 +65,10 @@ class ModelsClient
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$name, $dob, $cpf, $rg, $phone, $id]);
         } catch (PDOException $e) {
-            throw new \Exception("Error updating client: " . $e->getMessage());
+            throw new \Exception("Erro ao atualizar cliente: " . $e->getMessage());
         }
     }
 
-    // Excluir cliente
     public function deleteClient($id)
     {
         try {
@@ -81,7 +76,7 @@ class ModelsClient
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$id]);
         } catch (PDOException $e) {
-            throw new \Exception("Error deleting client: " . $e->getMessage());
+            throw new \Exception("Erro ao excluir cliente: " . $e->getMessage());
         }
     }
 }

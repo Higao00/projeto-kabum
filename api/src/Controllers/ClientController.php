@@ -13,7 +13,6 @@ class ClientController
         $this->clientModel = new ModelsClient();
     }
 
-    // Registrar cliente
     public function register($request, $response, $args)
     {
         $data = json_decode($request->getBody()->getContents(), true);
@@ -29,18 +28,12 @@ class ClientController
                 throw new \Exception('Missing required fields');
             }
 
-            // Limpar a data de nascimento (dob) para garantir o formato correto (YYYY-MM-DD)
             $dob = (new \DateTime($dob))->format('Y-m-d');
-
-            // Remover máscara do CPF (mantendo apenas os números)
             $cpf = preg_replace('/\D/', '', $cpf);
             $phone = preg_replace('/\D/', '', $phone);
             $rg = preg_replace('/\D/', '', $rg);
 
-            // Criar o cliente
             $createdClient = $this->clientModel->createClient($name, $dob, $cpf, $rg, $phone);
-
-            // Obter os dados completos do cliente criado
             $fullClientData = $this->clientModel->getClientById($createdClient['id']);
 
             $response->getBody()->write(json_encode($fullClientData));
@@ -51,8 +44,6 @@ class ClientController
         }
     }
 
-
-    // Obter todos os clientes
     public function getAllClients($request, $response, $args)
     {
         $clients = $this->clientModel->getAllClients();
@@ -61,7 +52,6 @@ class ClientController
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    // Obter cliente por ID
     public function getClientById($request, $response, $args)
     {
         $id = $args['id'];
@@ -76,7 +66,6 @@ class ClientController
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    // Atualizar cliente
     public function updateClient($request, $response, $args)
     {
         $id = $args['id'];
@@ -96,10 +85,7 @@ class ClientController
         }
 
         try {
-            // Atualizar o cliente
             $this->clientModel->updateClient($id, $name, $dob, $cpf, $rg, $phone);
-
-            // Buscar os dados atualizados do cliente
             $updatedClient = $this->clientModel->getClientById($id);
 
             $response->getBody()->write(json_encode($updatedClient));
@@ -110,7 +96,6 @@ class ClientController
         }
     }
 
-    // Excluir cliente
     public function deleteClient($request, $response, $args)
     {
         $id = $args['id'];

@@ -234,7 +234,7 @@ const Table = ({
                     <S.TableColumn field="city" header="Cidade" alignHeader={"left"} />
                     <S.TableColumn field="postal_code" header="CEP" alignHeader={"left"} />
                     <S.TableColumn field="state" header="Estado" alignHeader={"left"} />
-                    <S.TableColumn field="neighborhood" header="Vizinhança" alignHeader={"left"} />
+                    <S.TableColumn field="neighborhood" header="Número / Complemento" alignHeader={"left"} />
 
                     {buttons && (
                         <S.TableColumn

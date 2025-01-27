@@ -12,10 +12,8 @@ class ErrorHandlerMiddleware
 {
     public static function register($app)
     {
-        // Middleware de erros
         $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
-        // Tratamento para rotas não encontradas (404)
         $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function (
             Request $request,
             Throwable $exception,
@@ -31,7 +29,6 @@ class ErrorHandlerMiddleware
                 ->withStatus(404);
         });
 
-        // Tratamento para métodos HTTP não permitidos (405)
         $errorMiddleware->setErrorHandler(HttpMethodNotAllowedException::class, function (
             Request $request,
             Throwable $exception,

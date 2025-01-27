@@ -18,22 +18,16 @@ class ModelsAddress
     public function createAddress($client_id, $postal_code, $street, $neighborhood, $locality, $city, $state)
     {
         try {
-            // Iniciar transação
             $this->pdo->beginTransaction();
 
-            // Verificar se o cliente existe
             $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM clients WHERE id = :client_id");
             $stmt->execute(['client_id' => $client_id]);
             $clientExists = $stmt->fetchColumn();
 
             if (!$clientExists) {
-                throw new \Exception("Client with ID '$client_id' does not exist.");
+                throw new \Exception("Cliente com ID '$client_id' não existe.");
             }
 
-            // Sanitização dos dados de entrada (se necessário)
-            // Você pode adicionar filtros ou sanitização adicional conforme necessário
-
-            // Verificar se o endereço já está cadastrado para o cliente
             $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM addresses WHERE client_id = :client_id AND postal_code = :postal_code AND street = :street");
             $stmt->execute([
                 'client_id' => $client_id,
@@ -43,10 +37,9 @@ class ModelsAddress
             $addressExists = $stmt->fetchColumn();
 
             if ($addressExists) {
-                throw new \Exception("The address with postal code '$postal_code' and street '$street' is already registered for this client.");
+                throw new \Exception("O endereço com o CEP '$postal_code' e rua '$street' já está cadastrado para este cliente.");
             }
 
-            // Inserir o endereço no banco de dados
             $stmt = $this->pdo->prepare("
             INSERT INTO addresses (client_id, postal_code, street, neighborhood, locality, city, state) 
             VALUES (:client_id, :postal_code, :street, :neighborhood, :locality, :city, :state)");
@@ -61,10 +54,8 @@ class ModelsAddress
                 'state' => $state
             ]);
 
-            // Obter o ID do endereço inserido
             $addressId = $this->pdo->lastInsertId();
 
-            // Confirmar a transação
             $this->pdo->commit();
 
             $stmt = $this->pdo->prepare("SELECT * FROM addresses WHERE id = :id");
@@ -73,9 +64,8 @@ class ModelsAddress
 
             return $address;
         } catch (\Exception $e) {
-            // Reverter a transação em caso de erro
             $this->pdo->rollBack();
-            throw $e; // Repassar a exceção
+            throw $e;
         }
     }
 
@@ -90,9 +80,9 @@ class ModelsAddress
 
     public function getAllAddresses()
     {
-        $sql = "SELECT * FROM addresses"; // Consulta para pegar todos os endereços
-        $stmt = $this->pdo->query($sql); // Executa a consulta
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC); // Retorna todos os endereços como um array associativo
+        $sql = "SELECT * FROM addresses";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getAddressesByClientId($clientId)
