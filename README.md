@@ -25,6 +25,14 @@ git clone https://github.com/Higao00/projeto-kabum.git
 cd projeto-kabum
 ```
 
+### 1. Clone o Repositório
+
+```bash
+cd projeto-kabum/frontend
+npm install
+```
+
+
 ### 2. Suba os Contêineres com Docker Compose
 
 Execute o comando abaixo para iniciar os contêineres:
