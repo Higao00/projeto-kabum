@@ -90,8 +90,6 @@ const Users = () => {
     const handleCreate = async (data: T_User) => {
         setLoadingButton(true)
 
-        console.log(data)
-
         interface UserCreate {
             name: string
             email: string
@@ -102,7 +100,7 @@ const Users = () => {
         const user: UserCreate = {
             name: capitalizeWords(data.name),
             email: data.email,
-            status: true,
+            status: statusUnique.va,
             password: data.password || ''
         }
 
@@ -323,9 +321,12 @@ const Users = () => {
         setValue("email", user.email)
         setValue("status", user.status)
 
-        const updateStatus: Status = user.status ? { name: 'Ativo', va: true } : { name: 'Desativado', va: false }
+        if (user.status) {
+            const updateStatus: Status = user.status ? { name: 'Ativo', va: true } : { name: 'Desativado', va: false }
 
-        setStatusUnique(updateStatus)
+            setStatusUnique(updateStatus)
+        }
+
     }, [user])
 
     return (
