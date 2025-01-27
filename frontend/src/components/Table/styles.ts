@@ -6,7 +6,7 @@ import { BsFillPersonFill } from "react-icons/bs"
 import styled from "styled-components"
 
 interface T_Status {
-    status?: boolean
+    $status?: boolean
 }
 
 export const Table = styled(DataTable)`
@@ -25,7 +25,7 @@ export const Status = styled.div<T_Status>`
 
     margin-bottom: 5px;
 
-    background: ${({ status }) => (status ? "green" : "red")};
+    background: ${({ $status }) => ($status ? "green" : "red")};
     color: #fff;
 `
 export const ContainerButtonTable = styled.div`

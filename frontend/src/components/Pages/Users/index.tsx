@@ -5,41 +5,31 @@ import * as G from "@/styles/theme/global.styles"
 
 import { Dialog } from "primereact/dialog"
 import { Button } from "primereact/button"
-import { DataTable } from "primereact/datatable"
-import { Column } from "primereact/column"
-import { InputSwitch } from "primereact/inputswitch"
 import { classNames } from "primereact/utils"
-import { Dropdown } from "primereact/dropdown"
 import { BsCheck2, BsFillCloudUploadFill, BsTrash3, BsXLg } from "react-icons/bs"
 
 import _ from "lodash"
 import Card from "@/components/Card"
 import Filters from "@/components/Filters"
-import Image from "next/image"
 import Loader from "@/components/Loader"
 import { Controller, useForm } from "react-hook-form"
 
-import { sortByAlphabet, sortByCreatedAt, sortByID } from "@/lib/sortBy"
+import { sortByAlphabet, sortByID } from "@/lib/sortBy"
 import { capitalizeWords } from "@/lib/capitalizeWords"
-import { T_Permission } from "@/types/Permission/T_Permission"
 import { T_FilterOptions } from "@/types/Global/T_FilterOptions"
-import { T_Groups } from "@/types/Groups/T_Groups"
 import { T_User } from "@/types/Users/T_User"
 
 import getAllUsers from "@/services/User/getAll"
 import deleteUser from "@/services/User/delete"
 import updateUser from "@/services/User/update"
 import createUser from "@/services/User/create"
-import createUserPermission from "@/services/User/Permissions/create"
-import updateUserPermission from "@/services/User/Permissions/update"
-import createUserGroups from "@/services/User/Groups/create"
 import { Skeleton } from "@/components/Skeleton"
-import updateUserGroups from "@/services/User/Groups/update"
 
 import { convertDateToBrazilianStandard } from "@/lib/formatDateBR"
 import { ToastContext } from "@/contexts/ToastContext"
 import { VisualizationContext } from "@/contexts/VisualizationContext"
 import Table from "@/components/Table"
+import { Dropdown } from "primereact/dropdown"
 
 const Users = () => {
     const { showToast } = useContext(ToastContext)
@@ -50,11 +40,21 @@ const Users = () => {
     const [users, setUsers] = useState([] as T_User[])
     const [auxUsers, setAuxUsers] = useState([] as T_User[])
 
+    interface Status {
+        name: string;
+        va: boolean;
+    }
+
+    const [status] = useState([{ name: 'Ativo', va: true }, { name: 'Desativado', va: false }])
+    const [statusUnique, setStatusUnique] = useState({} as Status)
+
     const defaultValues: T_User = {
         email: "",
         name: "",
+        password: "",
         status: false,
     }
+
     // Loading button
     const [loadingButton, setLoadingButton] = useState(false)
 
@@ -72,6 +72,7 @@ const Users = () => {
         formState: { errors },
         setValue,
         reset,
+        register,
     } = useForm({ defaultValues })
 
 
@@ -89,16 +90,20 @@ const Users = () => {
     const handleCreate = async (data: T_User) => {
         setLoadingButton(true)
 
+        console.log(data)
+
         interface UserCreate {
             name: string
             email: string
             status: boolean
+            password: string
         }
 
         const user: UserCreate = {
             name: capitalizeWords(data.name),
             email: data.email,
-            status: data.status
+            status: true,
+            password: data.password || ''
         }
 
         var response: any = await createUser(user)
@@ -118,14 +123,14 @@ const Users = () => {
         setLoadingButton(true)
 
         const finalUser = {
-            status: user.status,
+            status: statusUnique.va,
             name: capitalizeWords(data.name),
             email: data.email.toLowerCase()
         }
 
         var response: any = await updateUser(finalUser, user.id)
 
-        if (response.status === 201) {
+        if (response.status === 200) {
             const { user } = response
 
             setUsers((users) => {
@@ -151,7 +156,7 @@ const Users = () => {
 
         var response: any = await deleteUser(user.id)
 
-        if (response.status === 201) {
+        if (response.status === 200) {
             const newUsers = users.filter((item) => item.id !== user.id)
             setUsers(newUsers)
             onHideDialogDelete()
@@ -178,6 +183,7 @@ const Users = () => {
         setDeleteDialog(false)
         setLoadingButton(false)
         setUser({} as T_User)
+        setStatusUnique({} as Status)
 
         reset()
     }
@@ -186,6 +192,7 @@ const Users = () => {
         setCreateDialog(false)
         setLoadingButton(false)
         setUser({} as T_User)
+        setStatusUnique({} as Status)
 
         reset()
     }
@@ -194,6 +201,7 @@ const Users = () => {
         setUpdateDialog(false)
         setLoadingButton(false)
         setUser({} as T_User)
+        setStatusUnique({} as Status)
 
         reset()
     }
@@ -203,7 +211,7 @@ const Users = () => {
 
         auxUsers.map((user) => {
             var cpf = user?.name ? user?.name.toLowerCase().includes(item.toLowerCase()) : ""
-            var dateCreate = user.createdAt?.toString() || ""
+            var dateCreate = user.created_at?.toString() || ""
 
             if (
                 cpf ||
@@ -260,11 +268,6 @@ const Users = () => {
         setSelectedOptionFilter(item)
 
         switch (item.code) {
-            case "date":
-                setUsers(sortByCreatedAt(users, item.type))
-                setAuxUsers(sortByCreatedAt(auxUsers, item.type))
-                break
-
             case "name":
                 setUsers(sortByAlphabet(users, "name", item.type))
                 setAuxUsers(sortByAlphabet(auxUsers, "name", item.type))
@@ -319,6 +322,10 @@ const Users = () => {
         setValue("name", user.name)
         setValue("email", user.email)
         setValue("status", user.status)
+
+        const updateStatus: Status = user.status ? { name: 'Ativo', va: true } : { name: 'Desativado', va: false }
+
+        setStatusUnique(updateStatus)
     }, [user])
 
     return (
@@ -347,7 +354,17 @@ const Users = () => {
             {/* Create */}
             <Dialog visible={createDialog} onHide={onHideDialogCreate} header="Criação de Usuário" draggable={false}>
                 <S.ContainerDialog>
-                    <form onSubmit={handleSubmit(handleCreate)}>
+                    <form onSubmit={handleSubmit(
+                        (data) => {
+                            // Log dos dados enviados ao formulário
+                            console.log("Form Data:", data);
+                            handleCreate(data); // Chama a função para processar o envio
+                        },
+                        (errors) => {
+                            // Log dos erros de validação
+                            console.error("Validation Errors:", errors);
+                        }
+                    )}>
                         <div className="flex flex-column gap-2">
                             {errors.name ? (
                                 <small className="p-error">{errors.name.message}</small>
@@ -391,6 +408,72 @@ const Users = () => {
                                 render={({ field }) => <S.InputTextLogin type="email" id={field.name} {...field} />}
                             />
                         </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.status ? (
+                                <small className="p-error">{errors.status.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.status }) + " label-input-login"} htmlFor="status">
+                                    Status*
+                                </label>
+                            )}
+
+                            <Dropdown
+                                {...register("status", {
+                                    required: "O status é obrigatorio",
+                                })}
+                                style={{ width: "100%" }}
+                                value={statusUnique}
+                                options={status}
+                                onChange={(e) => setStatusUnique(e.value)}
+                                optionLabel="name"
+                                id="status"
+                                placeholder="Selecione um Status"
+                            />
+                        </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.password ? (
+                                <small className="p-error">{errors.password.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.password }) + " label-input-login"} htmlFor="name">
+                                    Password*
+                                </label>
+                            )}
+
+                            <Controller
+                                name="password"
+                                control={control}
+                                rules={{ required: "Password é obrigatorio." }}
+                                render={({ field, fieldState }) => (
+                                    <S.PasswordLogin
+                                        className={classNames({ "p-invalid": fieldState.invalid })}
+                                        id={field.name}
+                                        {...field}
+                                        autoComplete="current-password"
+                                        feedback={false}
+                                        toggleMask
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <br />
+
+                        <S.ContainerButtons>
+                            <Button type="button" label="Cancelar" severity="danger" onClick={onHideDialogCreate} icon={<BsXLg />} />
+                            <Button
+                                type="submit"
+                                disabled={loadingButton}
+                                label="Salvar Usuário"
+                                severity="success"
+                                icon={loadingButton ? <Loader width="20" height="20" /> : <BsCheck2 />}
+                            />
+                        </S.ContainerButtons>
                     </form>
                 </S.ContainerDialog>
             </Dialog>
@@ -442,6 +525,44 @@ const Users = () => {
                                 render={({ field }) => <S.InputTextLogin type="email" id={field.name} {...field} />}
                             />
                         </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.status ? (
+                                <small className="p-error">{errors.status.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.status }) + " label-input-login"} htmlFor="status">
+                                    Status*
+                                </label>
+                            )}
+
+                            <Dropdown
+                                {...register("status", {
+                                    required: "O status é obrigatorio",
+                                })}
+                                style={{ width: "100%" }}
+                                value={statusUnique}
+                                options={status}
+                                onChange={(e) => setStatusUnique(e.value)}
+                                optionLabel="name"
+                                id="status"
+                                placeholder="Selecione um Status"
+                            />
+                        </div>
+
+                        <br />
+
+                        <S.ContainerButtons>
+                            <Button type="button" label="Cancelar" severity="danger" onClick={onHideDialogCreate} icon={<BsXLg />} />
+                            <Button
+                                type="submit"
+                                disabled={loadingButton}
+                                label="Salvar Usuário"
+                                severity="success"
+                                icon={loadingButton ? <Loader width="20" height="20" /> : <BsCheck2 />}
+                            />
+                        </S.ContainerButtons>
                     </form>
                 </S.ContainerDialog>
             </Dialog>
@@ -463,7 +584,7 @@ const Users = () => {
 
                             <S.ContainerData>
                                 <S.Title>Data de Criação: </S.Title>
-                                <S.Description>{convertDateToBrazilianStandard(user?.createdAt?.toLocaleString() || "")}</S.Description>
+                                <S.Description>{convertDateToBrazilianStandard(user?.created_at?.toLocaleString() || "")}</S.Description>
                             </S.ContainerData>
                         </div>
 

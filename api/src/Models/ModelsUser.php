@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Config\Database;
+use PDO;
 
 class ModelsUser
 {
@@ -30,8 +31,8 @@ class ModelsUser
 
         // Inserir o usuário no banco de dados
         $stmt = $this->pdo->prepare("
-        INSERT INTO users (name, email, password, status) 
-        VALUES (:name, :email, :password, :status)");
+            INSERT INTO users (name, email, password, status, created_at, updated_at) 
+            VALUES (:name, :email, :password, :status, NOW(), NOW())");
 
         $stmt->execute([
             'name' => $name,
@@ -42,13 +43,14 @@ class ModelsUser
 
         $userId = $this->pdo->lastInsertId();
 
-        return [
-            'id' => $userId,
-            'name' => $name,
-            'email' => $email,
-            'status' => $status
-        ];
+        // Buscar o registro completo do usuário criado
+        $stmt = $this->pdo->prepare("SELECT id, name, email, status, created_at, updated_at FROM users WHERE id = :id");
+        $stmt->execute(['id' => $userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $user;
     }
+
 
     // Obter usuário por ID
     public function getUserById($id)

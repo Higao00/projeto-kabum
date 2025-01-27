@@ -1,7 +1,8 @@
-import { InputText } from "primereact/inputtext"
-import { InputMask } from "primereact/inputmask"
-import { BsFillPersonFill } from "react-icons/bs"
-import styled from "styled-components"
+import { InputText } from "primereact/inputtext";
+import { InputMask } from "primereact/inputmask";
+import { BsFillPersonFill } from "react-icons/bs";
+import styled from "styled-components";
+import { Password } from "primereact/password";
 
 export const Container = styled.section`
     display: grid;
@@ -19,7 +20,7 @@ export const Container = styled.section`
     @media (min-width: 2200px) {
         grid-template-columns: repeat(4, 1fr);
     }
-`
+`;
 export const ContainerDialog = styled.div`
     width: 85vw;
 
@@ -40,7 +41,7 @@ export const ContainerDialog = styled.div`
     @media (min-width: 2200px) {
         width: 25vw;
     }
-`
+`;
 export const ContainerImageDeleteUser = styled.div`
     display: flex;
     align-items: center;
@@ -48,10 +49,9 @@ export const ContainerImageDeleteUser = styled.div`
     img {
         border-radius: 100%;
 
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
-            rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+        box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
     }
-`
+`;
 export const ContainerData = styled.div`
     width: 100%;
 
@@ -60,16 +60,16 @@ export const ContainerData = styled.div`
     justify-content: space-between;
 
     border-top: 1px solid #0000002b;
-`
+`;
 export const Title = styled.h3`
     font-size: clamp(1rem, 2vw, 1.2rem);
     color: ${(props) => props.theme.color.ternary};
-`
+`;
 export const Description = styled.p`
     font-size: clamp(1rem, 2vw, 1.1rem);
     font-family: ${(props) => props.theme.fonts.light};
     color: ${(props) => props.theme.color.ternary};
-`
+`;
 export const ContainerButtons = styled.div`
     width: 100%;
 
@@ -84,7 +84,7 @@ export const ContainerButtons = styled.div`
     button {
         margin-left: 1rem;
     }
-`
+`;
 export const ContainerIconBsFillPersonFill = styled.div`
     display: flex;
     align-items: center;
@@ -96,19 +96,19 @@ export const ContainerIconBsFillPersonFill = styled.div`
     background-color: #fff;
 
     border-radius: 100%;
-`
+`;
 export const IconBsFillPersonFill = styled(BsFillPersonFill)`
     font-size: 3rem;
     color: #000;
 
     border-radius: 100%;
-`
+`;
 export const InputTextLogin = styled(InputText)`
     width: 100%;
-`
+`;
 export const InputTextMask = styled(InputMask)`
     width: 100%;
-`
+`;
 export const ContainerUploadAndButtons = styled.div`
     width: 100%;
     height: 300px;
@@ -117,7 +117,7 @@ export const ContainerUploadAndButtons = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-`
+`;
 export const UploadImage = styled.div`
     width: 100%;
     min-height: 200px;
@@ -169,8 +169,22 @@ export const UploadImage = styled.div`
             }
         }
     }
-`
+`;
 export const SwitchContent = styled.div`
     display: flex;
     justify-content: center;
-`
+`;
+
+export const PasswordLogin = styled(Password)`
+    width: 100%;
+
+    div,
+    input {
+        width: 100%;
+    }
+
+    .p-input-icon {
+        display: flex;
+        justify-content: flex-end;
+    }
+`;

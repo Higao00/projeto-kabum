@@ -129,7 +129,7 @@ const Table = ({
                         header="Status"
                         alignHeader={"left"}
                         body={(data) => {
-                            return <S.Status status={data.status}>{data.status ? "Ativo" : "Desativado"}</S.Status>
+                            return <S.Status $status={data.status}>{data.status ? "Ativo" : "Desativado"}</S.Status>
                         }}
                     />
 

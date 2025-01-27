@@ -30,10 +30,7 @@ class UserController
             // Criar o usuário e obter os dados do usuário criado
             $createdUser = $this->userModel->createUser($name, $email, $password, $status);
 
-            $response->getBody()->write(json_encode([
-                'message' => 'User created successfully',
-                'user' => $createdUser
-            ]));
+            $response->getBody()->write(json_encode($createdUser));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
         } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
@@ -81,7 +78,6 @@ class UserController
 
         // Retorna a resposta com os dados do usuário e o token
         $response->getBody()->write(json_encode([
-            'message' => 'Login successful',
             'user' => [
                 'id' => $user['id'],
                 'name' => $user['name'],
@@ -165,16 +161,11 @@ class UserController
         unset($updatedUser['password']);
 
         // Retornar o objeto atualizado
-        $response->getBody()->write(json_encode([
-            'message' => 'User updated successfully',
-            'user' => $updatedUser,
-        ]));
+        $response->getBody()->write(json_encode($updatedUser));
 
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
-
-
-
+    
     // Excluir usuário
     public function deleteUser($request, $response, $args)
     {

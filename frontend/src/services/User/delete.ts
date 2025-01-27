@@ -4,7 +4,7 @@ import { T_Error } from "@/types/Message/T_Error"
 
 const deleteUser = async (id: number | undefined) => {
     try {
-        const response = await api.delete(`/users/delete/${id}`)
+        const response = await api.delete(`api/users/${id}`)
 
         return { status: response.status }
     } catch (error) {

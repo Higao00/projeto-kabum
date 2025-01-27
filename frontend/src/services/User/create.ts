@@ -4,7 +4,7 @@ import { T_Error } from "@/types/Message/T_Error"
 
 const createUser = async (user: any) => {
     try {
-        var response = await api.post(`/users/create`, user)
+        var response = await api.post(`api/users/create`, user)
 
         return { status: response.status, user: response.data }
     } catch (error) {

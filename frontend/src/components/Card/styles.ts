@@ -14,7 +14,7 @@ interface T_Card {
 }
 
 interface T_Status {
-    status?: boolean
+    $status?: boolean
 }
 
 export const Container = styled.div`
@@ -200,7 +200,7 @@ export const Status = styled.div<T_Status>`
 
     margin-bottom: 5px;
 
-    background: ${({ status }) => (status ? "green" : "red")};
+    background: ${({ $status }) => ($status ? "green" : "red")};
 `
 
 export const SplitButtonExtends = styled(SplitButton)`

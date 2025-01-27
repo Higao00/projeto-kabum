@@ -61,7 +61,7 @@ const Card = ({
                         <S.BodyCard>
                             <S.RightSideBodyCard>Status:</S.RightSideBodyCard>
                             <S.LeftSideBodyCard>
-                                <S.Status status={data.status}>{data.status ? "Ativo" : "Desativado"}</S.Status>
+                                <S.Status $status={data.status}>{data.status ? "Ativo" : "Desativado"}</S.Status>
                             </S.LeftSideBodyCard>
 
                             <S.RightSideBodyCard>Email:</S.RightSideBodyCard>

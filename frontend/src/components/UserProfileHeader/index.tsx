@@ -14,20 +14,12 @@ const UserProfileHeader = ({ userProfile }: T_UserProfile) => {
     const { logout, user } = useContext(AuthContext)
 
     return (
-        <S.ContainerUserProfile userProfile={userProfile}>
+        <S.ContainerUserProfile $userProfile={userProfile}>
             <S.FirstUserProfile>
                 <S.FirstUserProfileIcon>
-                    {user?.avatar_url ? (
-                        <S.ImageNext
-                            src={`${user.avatar_url}`}
-                            width={35}
-                            height={35}
-                            alt={`Avatar do ${user.name}`}
-                            priority
-                        />
-                    ) : (
-                        <S.IconBsFillPersonFill />
-                    )}
+
+                    <S.IconBsFillPersonFill />
+
                 </S.FirstUserProfileIcon>
 
                 <S.FirstUserProfileText>

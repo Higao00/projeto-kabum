@@ -4,15 +4,15 @@ import { BsFillSunFill, BsFillMoonStarsFill, BsXLg, BsList, BsFillPersonFill } f
 import { Dropdown } from "primereact/dropdown";
 
 interface T_ContainerSide {
-    menuSide: boolean | null;
+    $menuSide: boolean | null;
 }
 
 interface T_TitleSideMenu {
-    level: number;
+    $level: number;
 }
 
 interface T_ContainerLinkSideMenu {
-    level: number;
+    $level: number;
 }
 
 export const ContainerTop = styled.header`
@@ -38,7 +38,7 @@ export const ContainerTop = styled.header`
 `;
 export const ContainerSide = styled.div<T_ContainerSide>`
     width: 100%;
-    height: calc(100vh);
+    height: calc(100vh - 60px);
 
     position: absolute;
 
@@ -71,13 +71,13 @@ export const ContainerSide = styled.div<T_ContainerSide>`
     }
 
     @media only screen and (max-width: 800px) {
-        transform: ${({ menuSide }) => (menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-120vw, 0px, 0px)")};
+        transform: ${({ $menuSide }) => ($menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-120vw, 0px, 0px)")};
     }
 
     @media only screen and (min-width: 800px) {
-        width: 340px;
+        width: 250px;
 
-        transform: ${({ menuSide }) => (menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-400px, 0px, 0px)")};
+        transform: ${({ $menuSide }) => ($menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-400px, 0px, 0px)")};
     }
 `;
 export const ContainerSideMenu = styled.div``;
@@ -107,7 +107,7 @@ export const TitleSideMenu = styled.h2<T_TitleSideMenu>`
     font-family: ${(props) => props.theme.fonts.bold};
     color: ${(props) => props.theme.color.primary};
 
-    margin: ${({ level }) => (level ? "1.2rem " + `${level}rem` : "1.2rem 0.5rem")};
+    margin: ${({ $level }) => ($level ? "1.2rem " + `${$level}rem` : "1.2rem 0.5rem")};
 `;
 export const ContainerTextLinkMenu = styled.div`
     border-bottom: solid 1px #6e6e6e;
@@ -190,7 +190,7 @@ export const LeftContainer = styled.div`
 
     @media only screen and (min-width: 800px) {
         flex-direction: row;
-        width: 320px;
+        width: 250px;
     }
 `;
 export const RightContainer = styled.div`
@@ -254,13 +254,13 @@ export const ContainerSocialMedia = styled.div<T_ContainerSide>`
     }
 
     @media only screen and (max-width: 800px) {
-        transform: ${({ menuSide }) => (menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-120vw, 0px, 0px)")};
+        transform: ${({ $menuSide }) => ($menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-120vw, 0px, 0px)")};
     }
 
     @media only screen and (min-width: 800px) {
         width: 340px;
 
-        transform: ${({ menuSide }) => (menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-400px, 0px, 0px)")};
+        transform: ${({ $menuSide }) => ($menuSide ? "translate3d(0px, 0px, 0px)" : "translate3d(-400px, 0px, 0px)")};
     }
 `;
 export const ContainerUserNoGroup = styled.div`

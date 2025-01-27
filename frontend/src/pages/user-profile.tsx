@@ -19,7 +19,7 @@ export default function UserProfilePage() {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     // const apiClient = getAPIClient(ctx)
 
-    const { ["esquadros.portal.token"]: token } = parseCookies(ctx)
+    const { ["app.kabum"]: token } = parseCookies(ctx)
 
     if (!token) {
         return {

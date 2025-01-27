@@ -38,7 +38,7 @@ const Filters = ({
                     <S.Filters>
                         <S.ContainerFilters>
                             <span id="advancedSearchFilter" className="p-input-icon-left">
-                                <S.BsSearchExtended />
+                                {/* <S.BsSearchExtended /> */}
                                 <S.InputTextExtended
                                     placeholder="Pesquisar"
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,81 +47,13 @@ const Filters = ({
                                 />
                             </span>
 
-                            {options && (
-                                <div className="card flex justify-content-center">
-                                    <Dropdown
-                                        options={options}
-                                        value={selectedOptionFilter}
-                                        itemTemplate={(item: T_FilterOptions) => {
-                                            if (item.type === "asc") {
-                                                return (
-                                                    <S.IconOrderBy>
-                                                        <BsSortUpAlt fontSize={"1.2rem"} />
-                                                        <span>{item.name}</span>
-                                                    </S.IconOrderBy>
-                                                )
-                                            }
-
-                                            if (item.type === "desc") {
-                                                return (
-                                                    <S.IconOrderBy>
-                                                        <BsSortDown fontSize={"1.2rem"} />
-                                                        <span>{item.name}</span>
-                                                    </S.IconOrderBy>
-                                                )
-                                            }
-
-                                            return <span>{item.name}</span>
-                                        }}
-                                        valueTemplate={(item: T_FilterOptions, props) => {
-                                            if (item) {
-                                                if (item.type === "asc") {
-                                                    return (
-                                                        <S.IconOrderBy>
-                                                            <BsSortUpAlt fontSize={"1.2rem"} />
-                                                            <span>{item.name}</span>
-                                                        </S.IconOrderBy>
-                                                    )
-                                                }
-
-                                                if (item.type === "desc") {
-                                                    return (
-                                                        <S.IconOrderBy>
-                                                            <BsSortDown fontSize={"1.2rem"} />
-                                                            <span>{item.name}</span>
-                                                        </S.IconOrderBy>
-                                                    )
-                                                }
-
-                                                return <span>{item.name}</span>
-                                            }
-
-                                            return <span>{props.placeholder}</span>
-                                        }}
-                                        onChange={(e) => {
-                                            if (handleFiltersOrdination) handleFiltersOrdination(e.value)
-                                        }}
-                                        optionLabel="name"
-                                        placeholder="Ordenação"
-                                    />
-                                </div>
-                            )}
-
-                            {status && (
-                                <div className="card flex justify-content-center">
-                                    <Dropdown
-                                        options={status}
-                                        value={selectedStatusFilter}
-                                        onChange={(e: any) => {
-                                            if (handleFiltersStatus) handleFiltersStatus(e.value)
-                                        }}
-                                        placeholder="Status"
-                                    />
-                                </div>
-                            )}
                         </S.ContainerFilters>
 
                         <S.ContentButtonsTop>
+                            <S.ButtonExtended className="p-button-success" label="Adicionar" rounded onClick={handleOpenModalFilter}>
+                                <S.BsPlusLgExtended />
+                            </S.ButtonExtended>
+
                             {width > 1280 && (
                                 <S.ButtonExtended
                                     className="class-table-card-button"

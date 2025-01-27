@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
 interface T_ContainerSide {
-    menuSide: boolean
+    $menuSide: boolean
 }
 
 export const Container = styled.main<T_ContainerSide>`
@@ -31,8 +31,8 @@ export const Container = styled.main<T_ContainerSide>`
     }
 
     @media only screen and (min-width: 800px) {
-        width: ${({ menuSide }) => (menuSide ? "calc(100vw - 349px)" : "100%")};
-        margin-left: ${({ menuSide }) => (menuSide ? "349px" : "0px")};
+        width: ${({ $menuSide }) => ($menuSide ? "calc(100vw - 250px)" : "100%")};
+        margin-left: ${({ $menuSide }) => ($menuSide ? "250px" : "0px")};
 
         padding: 2rem;
 

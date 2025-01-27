@@ -1,7 +1,6 @@
 import React, { useEffect, useContext, useState } from "react"
 import {
     BsGear,
-    BsUpload,
     BsXLg,
     BsCheck2,
 } from "react-icons/bs"
@@ -12,18 +11,14 @@ import { T_User } from "@/types/Users/T_User"
 import { useForm } from "react-hook-form"
 import { ToastContext } from "@/contexts/ToastContext"
 
-import { ptBR } from "date-fns/locale/pt-BR"
-import { format } from "date-fns/format"
-
 import updateUser from "@/services/User/update"
 
 import * as G from "../../../styles/theme/global.styles"
 import * as S from "./styles"
-import Image from "next/image"
 
 interface T_AuxUser extends T_User {
-    createdAtFormated: string
-    updateAtFormated: string
+    created_atFormated: string
+    update_atFormated: string
 }
 
 const UserProfile = () => {
@@ -60,17 +55,12 @@ const UserProfile = () => {
             status: user?.status,
             name: data.name,
             email: data.email,
-            avatar_url: auxUser.avatar_url,
-            cpf: data.cpf,
         }
 
         var response: any = await updateUser(finalUser, user?.id)
         if (response.status === 201) {
             const { user } = response
-
             setAuxUser(user)
-
-            dateNormalize(user)
         } else {
             showToast("error", response.title, response.message, 3000)
         }
@@ -79,54 +69,21 @@ const UserProfile = () => {
         setStateEditProfile(!stateEditProfile)
     }
 
-    const dateNormalize = (thisUser: T_User) => {
-        if (thisUser) {
-            let createdAtAux
-            let updatedAtAux
-
-            auxUser = {
-                ...thisUser,
-                createdAtFormated: "",
-                updateAtFormated: "",
-            }
-
-            if (auxUser.createdAt !== undefined && auxUser.updateAt !== undefined) {
-                const createdAtDate = new Date(auxUser.createdAt)
-                const updateAtDate = new Date(auxUser.updateAt)
-
-                createdAtAux = format(createdAtDate, "dd/MM/yyyy", { locale: ptBR })
-                updatedAtAux = format(updateAtDate, "dd/MM/yyyy", { locale: ptBR })
-            }
-
-            auxUser.createdAtFormated = createdAtAux!
-            auxUser.updateAtFormated = updatedAtAux!
-
-            setAuxUser(auxUser)
-        }
-    }
-
     const setValuesHookForm = () => {
         setValue("name", auxUser.name)
-        setValue("cpf", auxUser.cpf!)
         setValue("email", auxUser.email)
     }
 
     const resetValuesHookForm = () => {
         auxUser.name = user!.name
-        auxUser.cpf = user?.cpf
         auxUser.email = user!.email
 
         setAuxUser(auxUser)
 
         setValue("name", user!.name)
-        setValue("cpf", user?.cpf ? user?.cpf : "")
         setValue("email", user!.email)
         reset()
     }
-
-    useEffect(() => {
-        dateNormalize(user!)
-    }, [user])
 
     return (
         <>
@@ -222,49 +179,6 @@ const UserProfile = () => {
                                             />
                                         </S.LabelInputText>
 
-                                        <S.LabelInputText>
-                                            <S.ErrorMessageCreateGroup className="p-error">
-                                                {errors.cpf && errors.cpf.message}
-                                            </S.ErrorMessageCreateGroup>
-                                            <p>CPF</p>
-                                            <InputText
-                                                {...register("cpf", {
-                                                    required: "O CPF é obrigatorio",
-                                                })}
-                                                disabled={!stateEditProfile}
-                                                type="text"
-                                                className="p-inputtext-sm"
-                                                value={
-                                                    auxUser?.cpf !== null &&
-                                                        auxUser?.cpf !== undefined
-                                                        ? auxUser.cpf
-                                                        : ""
-                                                }
-                                                placeholder={
-                                                    auxUser?.cpf !== null &&
-                                                        auxUser?.cpf !== undefined
-                                                        ? auxUser.cpf
-                                                        : ""
-                                                }
-                                                onChange={(e) => {
-                                                    setAuxUser((prevState) => ({
-                                                        ...auxUser,
-                                                        ["cpf"]: e.target.value,
-                                                    }))
-                                                }}
-                                                style={{ width: "100%" }}
-                                            />
-                                        </S.LabelInputText>
-
-                                        <S.LabelInputText>
-                                            <p>Telefone</p>
-                                            <InputText
-                                                disabled={!stateEditProfile}
-                                                type="text"
-                                                className="p-inputtext-sm"
-                                                style={{ width: "100%" }}
-                                            />
-                                        </S.LabelInputText>
                                     </S.ContentLabelsBodyLeft>
 
                                     <S.ContentLabelsBodyRight>
@@ -286,12 +200,12 @@ const UserProfile = () => {
                                         <S.LabelInputTextGrid>
                                             <div>
                                                 <p>Data de criação</p>
-                                                <S.ChipExtended label={auxUser.createdAtFormated} />
+                                                <S.ChipExtended label={auxUser.created_atFormated} />
                                             </div>
 
                                             <div>
                                                 <p>Data de atualização</p>
-                                                <S.ChipExtended label={auxUser.updateAtFormated} />
+                                                <S.ChipExtended label={auxUser.update_atFormated} />
                                             </div>
                                         </S.LabelInputTextGrid>
                                         <S.LabelInputTextGrid>
