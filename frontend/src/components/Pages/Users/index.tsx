@@ -323,7 +323,6 @@ const Users = () => {
 
         if (user.status) {
             const updateStatus: Status = user.status ? { name: 'Ativo', va: true } : { name: 'Desativado', va: false }
-
             setStatusUnique(updateStatus)
         }
 
