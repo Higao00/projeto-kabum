@@ -41,10 +41,6 @@ npm install
 Execute o comando abaixo para iniciar os contêineres:
 
 ```bash
-cd ..
-```
-
-```bash
 docker-compose up -d
 ```
 
