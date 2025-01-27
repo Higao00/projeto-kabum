@@ -23,6 +23,9 @@ Siga os passos abaixo para configurar e executar o projeto:
 
 ```bash
 git clone https://github.com/Higao00/projeto-kabum.git
+```
+
+```bash
 cd projeto-kabum
 ```
 
@@ -30,6 +33,9 @@ cd projeto-kabum
 
 ```bash
 cd projeto-kabum/frontend
+```
+
+```bash
 npm install
 ```
 
@@ -62,6 +68,9 @@ Este comando inicializa o script de migração dentro do contêiner `php-api`, c
 
 ```bash
 User: admin@gmail.com
+```
+
+```bash
 Password: 123456
 ```
 
