@@ -4,11 +4,15 @@ import * as S from "./styles"
 
 import { convertDateToBrazilianStandard } from "@/lib/formatDateBR"
 import { T_CardAndTable } from "@/types/Global/T_CardAndTable"
+import { formatCPF } from "@/lib/formatCPF"
+import { formatRG } from "@/lib/formatRG"
+import { formatPhone } from "@/lib/formatPhone"
 
 
 const Table = ({
     type,
     data,
+    buttons,
 
     // user
     setDataUser,
@@ -24,6 +28,8 @@ const Table = ({
     setDataAddress,
     processDeleteInformationAddress,
     processUpdateInformationAddress,
+    processViewAddressInformation,
+    handleGetByIdAddress
 
 }: T_CardAndTable) => {
     switch (type) {
@@ -66,36 +72,38 @@ const Table = ({
                         }}
                     />
 
-                    <S.TableColumn
-                        header=""
-                        alignHeader={"left"}
-                        style={{ width: "12%" }}
-                        body={(data) => {
-                            return (
-                                <S.SplitButtonExtends
-                                    label="Opções"
-                                    severity="info"
-                                    model={[
-                                        {
-                                            label: "Editar",
-                                            command: () => {
-                                                setDataUser!(data)
-                                                processUpdateInformationUser!()
+                    {buttons && (
+                        <S.TableColumn
+                            header=""
+                            alignHeader={"left"}
+                            style={{ width: "12%" }}
+                            body={(data) => {
+                                return (
+                                    <S.SplitButtonExtends
+                                        label="Opções"
+                                        severity="info"
+                                        model={[
+                                            {
+                                                label: "Editar",
+                                                command: () => {
+                                                    setDataUser!(data)
+                                                    processUpdateInformationUser!()
+                                                },
                                             },
-                                        },
 
-                                        {
-                                            label: "Remover",
-                                            command: () => {
-                                                setDataUser!(data)
-                                                processDeleteInformationUser!()
-                                            },
-                                        }
-                                    ]}
-                                />
-                            )
-                        }}
-                    ></S.TableColumn>
+                                            {
+                                                label: "Remover",
+                                                command: () => {
+                                                    setDataUser!(data)
+                                                    processDeleteInformationUser!()
+                                                },
+                                            }
+                                        ]}
+                                    />
+                                )
+                            }}
+                        ></S.TableColumn>
+                    )}
                 </S.Table>
             )
 
@@ -118,10 +126,38 @@ const Table = ({
 
                     <S.TableColumn field="id" header="ID" alignHeader={"left"} />
                     <S.TableColumn field="name" header="Nome" alignHeader={"left"} />
-                    <S.TableColumn field="cpf" header="CPF" alignHeader={"left"} />
-                    <S.TableColumn field="rg" header="RG" alignHeader={"left"} />
-                    <S.TableColumn field="phone" header="Telefone" alignHeader={"left"} />
-                    <S.TableColumn field="dob" header="Data Nascimento" alignHeader={"left"} />
+
+                    <S.TableColumn
+                        header="CPF"
+                        alignHeader={"left"}
+                        body={(data) => {
+                            return <> {formatCPF(data?.cpf)}</>
+                        }}
+                    />
+
+                    <S.TableColumn
+                        header="RG"
+                        alignHeader={"left"}
+                        body={(data) => {
+                            return <> {formatRG(data?.rg)}</>
+                        }}
+                    />
+
+                    <S.TableColumn
+                        header="Telefone"
+                        alignHeader={"left"}
+                        body={(data) => {
+                            return <> {formatPhone(data?.phone)}</>
+                        }}
+                    />
+
+                    <S.TableColumn
+                        header="Data Nascimento"
+                        alignHeader={"left"}
+                        body={(data) => {
+                            return <> {convertDateToBrazilianStandard(data?.dob)}</>
+                        }}
+                    />
 
                     <S.TableColumn
                         header="Data Criação"
@@ -131,36 +167,47 @@ const Table = ({
                         }}
                     />
 
-                    <S.TableColumn
-                        header=""
-                        alignHeader={"left"}
-                        style={{ width: "12%" }}
-                        body={(data) => {
-                            return (
-                                <S.SplitButtonExtends
-                                    label="Opções"
-                                    severity="info"
-                                    model={[
-                                        {
-                                            label: "Editar",
-                                            command: () => {
-                                                setDataClient!(data)
-                                                processUpdateInformationClient!()
+                    {buttons && (
+                        <S.TableColumn
+                            header=""
+                            alignHeader={"left"}
+                            style={{ width: "12%" }}
+                            body={(data) => {
+                                return (
+                                    <S.SplitButtonExtends
+                                        label="Opções"
+                                        severity="info"
+                                        model={[
+                                            {
+                                                label: "Editar",
+                                                command: () => {
+                                                    setDataClient!(data)
+                                                    processUpdateInformationClient!()
+                                                },
                                             },
-                                        },
 
-                                        {
-                                            label: "Remover",
-                                            command: () => {
-                                                setDataClient!(data)
-                                                processDeleteInformationClient!()
+                                            {
+                                                label: "Remover",
+                                                command: () => {
+                                                    setDataClient!(data)
+                                                    processDeleteInformationClient!()
+                                                },
                                             },
-                                        }
-                                    ]}
-                                />
-                            )
-                        }}
-                    ></S.TableColumn>
+
+                                            {
+                                                label: "Endereços",
+                                                command: () => {
+                                                    setDataClient!(data)
+                                                    handleGetByIdAddress?.(data.id)
+                                                    processViewAddressInformation!()
+                                                },
+                                            }
+                                        ]}
+                                    />
+                                )
+                            }}
+                        ></S.TableColumn>
+                    )}
                 </S.Table>
             )
 
@@ -189,36 +236,38 @@ const Table = ({
                     <S.TableColumn field="state" header="Estado" alignHeader={"left"} />
                     <S.TableColumn field="neighborhood" header="Vizinhança" alignHeader={"left"} />
 
-                    <S.TableColumn
-                        header=""
-                        alignHeader={"left"}
-                        style={{ width: "12%" }}
-                        body={(data) => {
-                            return (
-                                <S.SplitButtonExtends
-                                    label="Opções"
-                                    severity="info"
-                                    model={[
-                                        {
-                                            label: "Editar",
-                                            command: () => {
-                                                setDataAddress!(data)
-                                                processUpdateInformationAddress!()
+                    {buttons && (
+                        <S.TableColumn
+                            header=""
+                            alignHeader={"left"}
+                            style={{ width: "12%" }}
+                            body={(data) => {
+                                return (
+                                    <S.SplitButtonExtends
+                                        label="Opções"
+                                        severity="info"
+                                        model={[
+                                            {
+                                                label: "Editar",
+                                                command: () => {
+                                                    setDataAddress!(data)
+                                                    processUpdateInformationAddress!()
+                                                },
                                             },
-                                        },
 
-                                        {
-                                            label: "Remover",
-                                            command: () => {
-                                                setDataAddress!(data)
-                                                processDeleteInformationAddress!()
-                                            },
-                                        }
-                                    ]}
-                                />
-                            )
-                        }}
-                    ></S.TableColumn>
+                                            {
+                                                label: "Remover",
+                                                command: () => {
+                                                    setDataAddress!(data)
+                                                    processDeleteInformationAddress!()
+                                                },
+                                            }
+                                        ]}
+                                    />
+                                )
+                            }}
+                        ></S.TableColumn>
+                    )}
                 </S.Table>
             )
 

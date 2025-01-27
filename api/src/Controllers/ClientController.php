@@ -29,6 +29,14 @@ class ClientController
                 throw new \Exception('Missing required fields');
             }
 
+            // Limpar a data de nascimento (dob) para garantir o formato correto (YYYY-MM-DD)
+            $dob = (new \DateTime($dob))->format('Y-m-d');
+
+            // Remover máscara do CPF (mantendo apenas os números)
+            $cpf = preg_replace('/\D/', '', $cpf);
+            $phone = preg_replace('/\D/', '', $phone);
+            $rg = preg_replace('/\D/', '', $rg);
+
             // Criar o cliente
             $createdClient = $this->clientModel->createClient($name, $dob, $cpf, $rg, $phone);
 
@@ -42,6 +50,7 @@ class ClientController
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
     }
+
 
     // Obter todos os clientes
     public function getAllClients($request, $response, $args)

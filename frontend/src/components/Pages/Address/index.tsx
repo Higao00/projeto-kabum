@@ -251,6 +251,7 @@ const Address = () => {
                             key={index}
                             data={address}
                             type="address"
+                            buttons={true}
                             setDataAddress={setAddress}
                             processDeleteInformationAddress={processDeleteInformation}
                             processUpdateInformationAddress={processUpdateInformation}
@@ -265,6 +266,7 @@ const Address = () => {
                 <Table
                     data={addresses}
                     type="address"
+                    buttons={true}
                     setDataAddress={setAddress}
                     processDeleteInformationAddress={processDeleteInformation}
                     processUpdateInformationAddress={processUpdateInformation}

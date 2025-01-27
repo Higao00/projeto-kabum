@@ -233,6 +233,7 @@ const Users = () => {
                             key={index}
                             data={user}
                             type="users"
+                            buttons={true}
                             setDataUser={setUser}
                             processDeleteInformationUser={processDeleteInformation}
                             processUpdateInformationUser={processUpdateInformation}
@@ -248,6 +249,7 @@ const Users = () => {
                     data={users}
                     type="users"
                     setDataUser={setUser}
+                    buttons={true}
                     processDeleteInformationUser={processDeleteInformation}
                     processUpdateInformationUser={processUpdateInformation}
                 />

@@ -3,6 +3,7 @@ import { InputMask } from "primereact/inputmask";
 import { BsFillPersonFill } from "react-icons/bs";
 import styled from "styled-components";
 import { Password } from "primereact/password";
+import { Calendar } from "primereact/calendar";
 
 export const Container = styled.section`
     display: grid;
@@ -107,6 +108,10 @@ export const InputTextLogin = styled(InputText)`
     width: 100%;
 `;
 export const InputTextMask = styled(InputMask)`
+    width: 100%;
+`;
+
+export const InputCalendar = styled(Calendar)`
     width: 100%;
 `;
 export const ContainerUploadAndButtons = styled.div`

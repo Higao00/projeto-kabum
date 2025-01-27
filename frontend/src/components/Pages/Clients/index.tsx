@@ -29,6 +29,8 @@ import getAllClient from "@/services/Client/getAll"
 import createClient from "@/services/Client/create"
 import updateClient from "@/services/Client/update"
 import deleteClient from "@/services/Client/delete"
+import getAddressClientId from "@/services/Address/getIdClient"
+import { T_Address } from "@/types/Address/T_Address"
 
 const Clients = () => {
     const { showToast } = useContext(ToastContext)
@@ -38,6 +40,8 @@ const Clients = () => {
     const [client, setClient] = useState({} as T_Client)
     const [clients, setClients] = useState([] as T_Client[])
     const [auxClients, setAuxClients] = useState([] as T_Client[])
+
+    const [address, setAddress] = useState([] as T_Address[])
 
     const defaultValues: T_Client = {
         cpf: '',
@@ -54,9 +58,10 @@ const Clients = () => {
     const [updateDialog, setUpdateDialog] = useState(false)
     const [deleteDialog, setDeleteDialog] = useState(false)
     const [createDialog, setCreateDialog] = useState(false)
+    const [viewAddressDialog, setViewAddressDialog] = useState(false)
 
     // Filters
-    const [selectedOptionFilter, setSelectedOptionFilter] = useState({} as T_FilterOptions)
+    const [selectedOptionFilter] = useState({} as T_FilterOptions)
 
     const {
         handleSubmit,
@@ -73,6 +78,16 @@ const Clients = () => {
         if (response.status === 200) {
             setClients(response.clients)
             setAuxClients(response.clients)
+        } else {
+            showToast("error", response.title, response.message, 3000)
+        }
+    }
+
+    const handleGetByIdAddress = async (idClient: number) => {
+        const response: any = await getAddressClientId(idClient)
+
+        if (response.status === 200) {
+            setAddress(response.address)
         } else {
             showToast("error", response.title, response.message, 3000)
         }
@@ -159,6 +174,11 @@ const Clients = () => {
         }
     }
 
+    const processCreateInformation = () => {
+        setClient({} as T_Client)
+        setCreateDialog(true)
+    }
+
     const processUpdateInformation = () => {
         setUpdateDialog(true)
     }
@@ -167,9 +187,8 @@ const Clients = () => {
         setDeleteDialog(true)
     }
 
-    const processCreateInformation = () => {
-        setClient({} as T_Client)
-        setCreateDialog(true)
+    const processViewAddressInformation = () => {
+        setViewAddressDialog(true)
     }
 
     const onHideDialogDelete = () => {
@@ -190,6 +209,14 @@ const Clients = () => {
 
     const onHideDialogUpdate = () => {
         setUpdateDialog(false)
+        setLoadingButton(false)
+        setClient({} as T_Client)
+
+        reset()
+    }
+
+    const onHideDialogViewAddress = () => {
+        setViewAddressDialog(false)
         setLoadingButton(false)
         setClient({} as T_Client)
 
@@ -225,9 +252,12 @@ const Clients = () => {
                             key={index}
                             data={client}
                             type="clients"
+                            buttons={true}
                             setDataClient={setClient}
                             processDeleteInformationClient={processDeleteInformation}
                             processUpdateInformationClient={processUpdateInformation}
+                            processViewAddressInformation={processViewAddressInformation}
+                            handleGetByIdAddress={handleGetByIdAddress}
                         />
                     ))}
                 </S.Container>
@@ -239,9 +269,12 @@ const Clients = () => {
                 <Table
                     data={clients}
                     type="clients"
+                    buttons={true}
                     setDataClient={setClient}
                     processDeleteInformationClient={processDeleteInformation}
                     processUpdateInformationClient={processUpdateInformation}
+                    processViewAddressInformation={processViewAddressInformation}
+                    handleGetByIdAddress={handleGetByIdAddress}
                 />
             )
         }
@@ -319,8 +352,17 @@ const Clients = () => {
                                 control={control}
                                 rules={{
                                     required: "CPF é obrigatorio.",
+                                    validate: (value) => {
+                                        const numericValue = value.replace(/\D/g, "");
+
+                                        if (numericValue.length !== 11) {
+                                            return "CPF deve ter exatamente 11 dígitos.";
+                                        }
+
+                                        return true;
+                                    },
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="cpf" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextMask type="text" mask="999.999.999-99" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -340,8 +382,17 @@ const Clients = () => {
                                 control={control}
                                 rules={{
                                     required: "RG é obrigatorio.",
+                                    validate: (value) => {
+                                        const numericValue = value.replace(/\D/g, "");
+
+                                        if (numericValue.length !== 9) {
+                                            return "RG deve ter exatamente 9 dígitos.";
+                                        }
+
+                                        return true;
+                                    },
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="rg" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextMask type="text" mask="99.999.999-9" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -361,8 +412,17 @@ const Clients = () => {
                                 control={control}
                                 rules={{
                                     required: "Telefone é obrigatorio.",
+                                    validate: (value) => {
+                                        const numericValue = value.replace(/\D/g, "");
+
+                                        if (numericValue.length !== 11) {
+                                            return "Telefone deve ter exatamente 11 dígitos.";
+                                        }
+
+                                        return true;
+                                    },
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="phone" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextMask type="text" mask="(99) 99999-9999" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -381,10 +441,22 @@ const Clients = () => {
                                 name="dob"
                                 control={control}
                                 rules={{
-                                    required: "Data de Nascimento é obrigatorio.",
+                                    required: "Data de Nascimento é obrigatória.",
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="dob" id={field.name} {...field} />}
+                                render={({ field }) => {
+                                    const dateValue = field.value ? new Date(field.value) : null;
+
+                                    return (
+                                        <S.InputCalendar
+                                            id={field.name}
+                                            value={dateValue}
+                                            onChange={(e) => field.onChange(e.value)}  // Passa o valor correto para o controller
+                                            dateFormat="dd/mm/yy"
+                                        />
+                                    );
+                                }}
                             />
+
                         </div>
 
                         <br />
@@ -442,8 +514,17 @@ const Clients = () => {
                                 control={control}
                                 rules={{
                                     required: "CPF é obrigatorio.",
+                                    validate: (value) => {
+                                        const numericValue = value.replace(/\D/g, "");
+
+                                        if (numericValue.length !== 11) {
+                                            return "CPF deve ter exatamente 11 dígitos.";
+                                        }
+
+                                        return true;
+                                    },
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="cpf" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextMask type="text" mask="999.999.999-99" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -463,8 +544,17 @@ const Clients = () => {
                                 control={control}
                                 rules={{
                                     required: "RG é obrigatorio.",
+                                    validate: (value) => {
+                                        const numericValue = value.replace(/\D/g, "");
+
+                                        if (numericValue.length !== 9) {
+                                            return "RG deve ter exatamente 9 dígitos.";
+                                        }
+
+                                        return true;
+                                    },
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="rg" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextMask type="text" mask="99.999.999-9" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -484,8 +574,17 @@ const Clients = () => {
                                 control={control}
                                 rules={{
                                     required: "Telefone é obrigatorio.",
+                                    validate: (value) => {
+                                        const numericValue = value.replace(/\D/g, "");
+
+                                        if (numericValue.length !== 11) {
+                                            return "Telefone deve ter exatamente 11 dígitos.";
+                                        }
+
+                                        return true;
+                                    },
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="phone" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextMask type="text" mask="(99) 99999-9999" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -504,9 +603,20 @@ const Clients = () => {
                                 name="dob"
                                 control={control}
                                 rules={{
-                                    required: "Data de Nascimento é obrigatorio.",
+                                    required: "Data de Nascimento é obrigatória.",
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="dob" id={field.name} {...field} />}
+                                render={({ field }) => {
+                                    const dateValue = field.value ? new Date(field.value) : null;
+
+                                    return (
+                                        <S.InputCalendar
+                                            id={field.name}
+                                            value={dateValue}
+                                            onChange={(e) => field.onChange(e.value)}  // Passa o valor correto para o controller
+                                            dateFormat="dd/mm/yy"
+                                        />
+                                    );
+                                }}
                             />
                         </div>
 
@@ -558,6 +668,17 @@ const Clients = () => {
                             />
                         </S.ContainerButtons>
                     </form>
+                </S.ContainerDialog>
+            </Dialog>
+
+            {/* View Address */}
+            <Dialog visible={viewAddressDialog} onHide={onHideDialogViewAddress} header={`Endereços do cliente: ${client.name}`} draggable={false}>
+                <S.ContainerDialog style={{ width: '60vw' }}>
+                    <Table
+                        data={address}
+                        type="address"
+                        buttons={false}
+                    />
                 </S.ContainerDialog>
             </Dialog>
         </>

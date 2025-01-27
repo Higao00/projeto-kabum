@@ -8,7 +8,7 @@ class CreateClientsTable
         $sql = "CREATE TABLE IF NOT EXISTS clients (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
-                    dob DATE NOT NULL,
+                    dob DATETIME NOT NULL,
                     cpf VARCHAR(14) NOT NULL UNIQUE,
                     rg VARCHAR(20) NOT NULL,
                     phone VARCHAR(20) NOT NULL,

@@ -61,7 +61,11 @@ class ModelsAddress
                 'state' => $state
             ]);
 
+            // Obter o ID do endereço inserido
             $addressId = $this->pdo->lastInsertId();
+
+            // Confirmar a transação
+            $this->pdo->commit();
 
             $stmt = $this->pdo->prepare("SELECT * FROM addresses WHERE id = :id");
             $stmt->execute(['id' => $addressId]);

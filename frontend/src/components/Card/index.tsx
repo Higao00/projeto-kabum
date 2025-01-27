@@ -7,10 +7,14 @@ import { T_CardAndTable } from "@/types/Global/T_CardAndTable"
 import { formatCPF } from "@/lib/formatCPF"
 import { convertDateToBrazilianStandard } from "@/lib/formatDateBR"
 import { firstAndLastName } from "@/lib/firstAndLastName"
+import { formatRG } from "@/lib/formatRG"
+import { formatPhone } from "@/lib/formatPhone"
+import { T_Client } from "@/types/Client/T_Client"
 
 const Card = ({
     type,
     data,
+    buttons,
 
     // user
     setDataUser,
@@ -27,6 +31,8 @@ const Card = ({
     setDataAddress,
     processDeleteInformationAddress,
     processUpdateInformationAddress,
+    processViewAddressInformation,
+    handleGetByIdAddress,
 
 
 }: T_CardAndTable) => {
@@ -64,27 +70,29 @@ const Card = ({
                             <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data?.created_at, true)}</S.LeftSideBodyCard>
                         </S.BodyCard>
 
-                        <S.BottomCard>
-                            <Button
-                                label="Editar"
-                                severity="info"
+                        {buttons && (
+                            <S.BottomCard>
+                                <Button
+                                    label="Editar"
+                                    severity="info"
 
-                                onClick={() => {
-                                    setDataUser!(data)
-                                    processUpdateInformationUser!()
-                                }}
-                            />
+                                    onClick={() => {
+                                        setDataUser!(data)
+                                        processUpdateInformationUser!()
+                                    }}
+                                />
 
-                            <Button
-                                label="Remover"
-                                severity="danger"
+                                <Button
+                                    label="Remover"
+                                    severity="danger"
 
-                                onClick={() => {
-                                    setDataUser!(data)
-                                    processDeleteInformationUser!()
-                                }}
-                            />
-                        </S.BottomCard>
+                                    onClick={() => {
+                                        setDataUser!(data)
+                                        processDeleteInformationUser!()
+                                    }}
+                                />
+                            </S.BottomCard>
+                        )}
                     </S.Card>
                 </S.Container>
             )
@@ -111,40 +119,53 @@ const Card = ({
 
                         <S.BodyCard>
                             <S.RightSideBodyCard>CPF:</S.RightSideBodyCard>
-                            <S.LeftSideBodyCard>{data.cpf}</S.LeftSideBodyCard>
+                            <S.LeftSideBodyCard>{formatCPF(data.cpf)}</S.LeftSideBodyCard>
 
                             <S.RightSideBodyCard>RG:</S.RightSideBodyCard>
-                            <S.LeftSideBodyCard>{data.rg}</S.LeftSideBodyCard>
+                            <S.LeftSideBodyCard>{formatRG(data.rg)}</S.LeftSideBodyCard>
 
                             <S.RightSideBodyCard>Telefone:</S.RightSideBodyCard>
-                            <S.LeftSideBodyCard>{data.phone}</S.LeftSideBodyCard>
+                            <S.LeftSideBodyCard>{formatPhone(data.phone)}</S.LeftSideBodyCard>
 
                             <S.RightSideBodyCard>Data de Nascimento:</S.RightSideBodyCard>
-                            <S.LeftSideBodyCard>{data.dob}</S.LeftSideBodyCard>
+                            <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data.dob, false)}</S.LeftSideBodyCard>
 
                             <S.RightSideBodyCard>Data:</S.RightSideBodyCard>
                             <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data?.created_at, true)}</S.LeftSideBodyCard>
                         </S.BodyCard>
 
-                        <S.BottomCard>
-                            <Button
-                                label="Editar"
-                                severity="info"
-                                onClick={() => {
-                                    setDataClient!(data)
-                                    processUpdateInformationClient!()
-                                }}
-                            />
+                        {buttons && (
+                            <S.BottomCard>
+                                <Button
+                                    label="Editar"
+                                    severity="info"
+                                    onClick={() => {
+                                        setDataClient!(data)
+                                        processUpdateInformationClient!()
+                                    }}
+                                />
 
-                            <Button
-                                label="Remover"
-                                severity="danger"
-                                onClick={() => {
-                                    setDataClient!(data)
-                                    processDeleteInformationClient!()
-                                }}
-                            />
-                        </S.BottomCard>
+                                <Button
+                                    label="Remover"
+                                    severity="danger"
+                                    onClick={() => {
+                                        setDataClient!(data)
+                                        processDeleteInformationClient!()
+                                    }}
+                                />
+
+                                <Button
+                                    label="Endereço"
+                                    severity="info"
+                                    onClick={() => {
+                                        setDataClient!(data)
+                                        handleGetByIdAddress?.(data.id)
+                                        processViewAddressInformation!()
+                                    }}
+                                />
+
+                            </S.BottomCard>
+                        )}
                     </S.Card>
                 </S.Container>
             )
@@ -186,25 +207,27 @@ const Card = ({
                             <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data?.created_at, true)}</S.LeftSideBodyCard>
                         </S.BodyCard>
 
-                        <S.BottomCard>
-                            <Button
-                                label="Editar"
-                                severity="info"
-                                onClick={() => {
-                                    setDataAddress!(data)
-                                    processUpdateInformationAddress!()
-                                }}
-                            />
+                        {buttons && (
+                            <S.BottomCard>
+                                <Button
+                                    label="Editar"
+                                    severity="info"
+                                    onClick={() => {
+                                        setDataAddress!(data)
+                                        processUpdateInformationAddress!()
+                                    }}
+                                />
 
-                            <Button
-                                label="Remover"
-                                severity="danger"
-                                onClick={() => {
-                                    setDataAddress!(data)
-                                    processDeleteInformationAddress!()
-                                }}
-                            />
-                        </S.BottomCard>
+                                <Button
+                                    label="Remover"
+                                    severity="danger"
+                                    onClick={() => {
+                                        setDataAddress!(data)
+                                        processDeleteInformationAddress!()
+                                    }}
+                                />
+                            </S.BottomCard>
+                        )}
                     </S.Card>
                 </S.Container>
             )
