@@ -25,11 +25,11 @@ class CreateSeedData
         // Inserir 5 registros na tabela 'addresses' com referências válidas de client_id
         // Aqui, é importante que os client_id estejam de acordo com os registros na tabela 'clients'
         $sql = "INSERT INTO addresses (client_id, postal_code, street, neighborhood, locality, city, state) VALUES
-                (1, '12345-000', 'Rua A', 'Centro', 'Localidade A', 'Cidade A', 'MG'),
-                (2, '23456-000', 'Rua B', 'Jardim', 'Localidade B', 'Cidade B', 'SP'),
-                (3, '34567-000', 'Rua C', 'Vila Nova', 'Localidade C', 'Cidade C', 'RJ'),
-                (4, '45678-000', 'Rua D', 'Bairro Alto', 'Localidade D', 'Cidade D', 'PR'),
-                (5, '56789-000', 'Rua E', 'Boa Vista', 'Localidade E', 'Cidade E', 'BA')";
+                (1, '12345-000', 'Rua A', '5005', 'Localidade A', 'Cidade A', 'MG'),
+                (2, '23456-000', 'Rua B', '2006', 'Localidade B', 'Cidade B', 'SP'),
+                (3, '34567-000', 'Rua C', '105 AP15', 'Localidade C', 'Cidade C', 'RJ'),
+                (4, '45678-000', 'Rua D', '23 AP45', 'Localidade D', 'Cidade D', 'PR'),
+                (5, '56789-000', 'Rua E', '1002', 'Localidade E', 'Cidade E', 'BA')";
         $db->exec($sql);
     }
 

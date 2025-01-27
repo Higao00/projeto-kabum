@@ -56,10 +56,18 @@ docker exec -it php-api php migrate.php
 
 Este comando inicializa o script de migração dentro do contêiner `php-api`, criando as tabelas necessárias no banco de dados.
 
+
+### 4. Após as migrações você pode acessar a aplicação com o super usuário.
+
+```bash
+User: admin@gmail.com
+Password: 123456
+```
+
 ## Estrutura do Projeto
 
 -   **/api**: Contém a API desenvolvida em PHP.
--   **/frontend**: Código para o frontend da aplicação (caso exista).
+-   **/frontend**: Código para o frontend em NextJs.
 -   **docker-compose.yml**: Configuração dos serviços Docker.
 -   **migrate.php**: Script de migração para configurar o banco de dados.
 

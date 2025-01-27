@@ -5,7 +5,6 @@ import { T_ChangeTheme } from "@/types/Global/T_ChangeTheme"
 import Image from "next/image"
 import Link from "next/link"
 import * as S from "./styles"
-import { parseCookies } from "nookies"
 import UserProfileHeader from "@/components/UserProfileHeader"
 
 const Header: React.FC<T_ChangeTheme> = ({ alterMenuSide, menuSide }) => {
@@ -54,20 +53,20 @@ const Header: React.FC<T_ChangeTheme> = ({ alterMenuSide, menuSide }) => {
                     </S.ContainerSideMenu>
 
                     <S.ContainerSideMenu>
-                        <Link href={"/clientes"} onClickCapture={alterMenuSide}>
+                        <Link href={"/usuarios"} onClickCapture={alterMenuSide}>
                             <S.ContainerLinkSideMenu>
                                 <i className={'pi pi-users'} style={{ fontSize: "1.2rem", color: "#fff" }}></i>
-                                <S.LinkSideMenu>Clientes</S.LinkSideMenu>
+                                <S.LinkSideMenu>Usuários</S.LinkSideMenu>
                                 <br />
                             </S.ContainerLinkSideMenu>
                         </Link>
                     </S.ContainerSideMenu>
 
                     <S.ContainerSideMenu>
-                        <Link href={"/usuarios"} onClickCapture={alterMenuSide}>
+                        <Link href={"/clientes"} onClickCapture={alterMenuSide}>
                             <S.ContainerLinkSideMenu>
                                 <i className={'pi pi-users'} style={{ fontSize: "1.2rem", color: "#fff" }}></i>
-                                <S.LinkSideMenu>Usuários</S.LinkSideMenu>
+                                <S.LinkSideMenu>Clientes</S.LinkSideMenu>
                                 <br />
                             </S.ContainerLinkSideMenu>
                         </Link>

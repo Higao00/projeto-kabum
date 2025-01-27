@@ -28,12 +28,12 @@ const UserProfileHeader = ({ userProfile }: T_UserProfile) => {
             </S.FirstUserProfile>
 
             <S.SecondUserProfile>
-                <S.ButtonLogout
+                {/* <S.ButtonLogout
                     severity="warning"
                     label="Perfil"
                     onClick={() => router.push("/user-profile")}
                     icon={<S.IconBsFillPersonVcardFill />}
-                />
+                /> */}
 
                 <S.ButtonLogout
                     severity="danger"
