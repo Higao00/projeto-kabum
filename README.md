@@ -97,12 +97,16 @@ docker-compose build --no-cache
 docker-compose up -d
 ```
 
-### Acessar o Contêiner PHP
+### Acessar o Contêiner PHP e NEXTJS
 
 Para entrar no contêiner PHP e executar comandos manualmente:
 
 ```bash
 docker exec -it php-api bash
+```
+
+```bash
+docker exec -it frontend bash
 ```
 
 ## Problemas Comuns
@@ -120,4 +124,4 @@ Este projeto é licenciado sob a [MIT License](LICENSE).
 
 ---
 
-Desenvolvido com 💻 e ☕ por [Seu Nome].
+Desenvolvido com 💻 e ☕ por Higor Henrique.
