@@ -60,8 +60,18 @@ docker exec -it php-api php migrate.php
 
 Este comando inicializa o script de migração dentro do contêiner `php-api`, criando as tabelas necessárias no banco de dados.
 
+### 4. Acessando o Projeto
+O frontend pode ser acessado em:
+```bash
+http://localhost
+```
 
-### 4. Após as migrações você pode acessar a aplicação com o super usuário.
+A API pode ser acessada em:
+```bash
+http://localhost/api
+```
+
+### 5. Após as migrações você pode acessar a aplicação com o super usuário.
 
 ```bash
 User: admin@gmail.com
