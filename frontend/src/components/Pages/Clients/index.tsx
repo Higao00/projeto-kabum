@@ -6,7 +6,7 @@ import * as G from "@/styles/theme/global.styles"
 import { Dialog } from "primereact/dialog"
 import { Button } from "primereact/button"
 import { classNames } from "primereact/utils"
-import { BsCheck2, BsFillCloudUploadFill, BsTrash3, BsXLg } from "react-icons/bs"
+import { BsCheck2, BsTrash3, BsXLg } from "react-icons/bs"
 
 import _ from "lodash"
 import Card from "@/components/Card"
@@ -17,42 +17,34 @@ import { Controller, useForm } from "react-hook-form"
 import { sortByAlphabet, sortByID } from "@/lib/sortBy"
 import { capitalizeWords } from "@/lib/capitalizeWords"
 import { T_FilterOptions } from "@/types/Global/T_FilterOptions"
-import { T_User } from "@/types/Users/T_User"
 
-import getAllUsers from "@/services/User/getAll"
-import deleteUser from "@/services/User/delete"
-import updateUser from "@/services/User/update"
-import createUser from "@/services/User/create"
 import { Skeleton } from "@/components/Skeleton"
 
 import { convertDateToBrazilianStandard } from "@/lib/formatDateBR"
 import { ToastContext } from "@/contexts/ToastContext"
 import { VisualizationContext } from "@/contexts/VisualizationContext"
 import Table from "@/components/Table"
-import { Dropdown } from "primereact/dropdown"
+import { T_Client } from "@/types/Client/T_Client"
+import getAllClient from "@/services/Client/getAll"
+import createClient from "@/services/Client/create"
+import updateClient from "@/services/Client/update"
+import deleteClient from "@/services/Client/delete"
 
-const Users = () => {
+const Clients = () => {
     const { showToast } = useContext(ToastContext)
     const { visualization } = useContext(VisualizationContext)
 
     // States to user
-    const [user, setUser] = useState({} as T_User)
-    const [users, setUsers] = useState([] as T_User[])
-    const [auxUsers, setAuxUsers] = useState([] as T_User[])
+    const [client, setClient] = useState({} as T_Client)
+    const [clients, setClients] = useState([] as T_Client[])
+    const [auxClients, setAuxClients] = useState([] as T_Client[])
 
-    interface Status {
-        name: string;
-        va: boolean;
-    }
-
-    const [status] = useState([{ name: 'Ativo', va: true }, { name: 'Desativado', va: false }])
-    const [statusUnique, setStatusUnique] = useState({} as Status)
-
-    const defaultValues: T_User = {
-        email: "",
-        name: "",
-        password: "",
-        status: false,
+    const defaultValues: T_Client = {
+        cpf: '',
+        dob: '',
+        name: '',
+        phone: '',
+        rg: ''
     }
 
     // Loading button
@@ -72,44 +64,45 @@ const Users = () => {
         formState: { errors },
         setValue,
         reset,
-        register,
     } = useForm({ defaultValues })
 
 
     const handleGetAll = async () => {
-        const response: any = await getAllUsers()
+        const response: any = await getAllClient()
 
         if (response.status === 200) {
-            setUsers(response.users)
-            setAuxUsers(response.users)
+            setClients(response.clients)
+            setAuxClients(response.clients)
         } else {
             showToast("error", response.title, response.message, 3000)
         }
     }
 
-    const handleCreate = async (data: T_User) => {
+    const handleCreate = async (data: T_Client) => {
         setLoadingButton(true)
 
-        interface UserCreate {
-            name: string
-            email: string
-            status: boolean
-            password: string
+        interface ClientsCreate {
+            name: string;
+            dob: string;
+            cpf: string;
+            rg: string;
+            phone: string;
         }
 
-        const user: UserCreate = {
+        const client: ClientsCreate = {
             name: capitalizeWords(data.name),
-            email: data.email,
-            status: statusUnique.va,
-            password: data.password || ''
+            cpf: data.cpf,
+            dob: data.dob,
+            phone: data.phone,
+            rg: data.rg
         }
 
-        var response: any = await createUser(user)
+        var response: any = await createClient(client)
 
         if (response.status === 201) {
-            const finalUser: T_User = response.user
+            const finalClient: T_Client = response.client
 
-            setUsers((users) => [...users, finalUser])
+            setClients((client) => [...client, finalClient])
             onHideDialogCreate()
         } else {
             setLoadingButton(false)
@@ -117,24 +110,26 @@ const Users = () => {
         }
     }
 
-    const handleUpdate = async (data: T_User) => {
+    const handleUpdate = async (data: T_Client) => {
         setLoadingButton(true)
 
-        const finalUser = {
-            status: statusUnique.va,
+        const finaClient = {
             name: capitalizeWords(data.name),
-            email: data.email.toLowerCase()
+            cpf: data.cpf,
+            dob: data.dob,
+            phone: data.phone,
+            rg: data.rg
         }
 
-        var response: any = await updateUser(finalUser, user.id)
+        var response: any = await updateClient(finaClient, client.id)
 
         if (response.status === 200) {
-            const { user } = response
+            const { client } = response
 
-            setUsers((users) => {
-                return users.map((u) => {
-                    if (user.id === u.id) {
-                        return response.user
+            setClients((clients) => {
+                return clients.map((u) => {
+                    if (client.id === u.id) {
+                        return response.client
                     } else {
                         return u
                     }
@@ -152,11 +147,11 @@ const Users = () => {
 
         setLoadingButton(true)
 
-        var response: any = await deleteUser(user.id)
+        var response: any = await deleteClient(client.id)
 
         if (response.status === 200) {
-            const newUsers = users.filter((item) => item.id !== user.id)
-            setUsers(newUsers)
+            const newClients = clients.filter((item) => item.id !== client.id)
+            setClients(newClients)
             onHideDialogDelete()
         } else {
             setLoadingButton(false)
@@ -173,15 +168,14 @@ const Users = () => {
     }
 
     const processCreateInformation = () => {
-        setUser({} as T_User)
+        setClient({} as T_Client)
         setCreateDialog(true)
     }
 
     const onHideDialogDelete = () => {
         setDeleteDialog(false)
         setLoadingButton(false)
-        setUser({} as T_User)
-        setStatusUnique({} as Status)
+        setClient({} as T_Client)
 
         reset()
     }
@@ -189,8 +183,7 @@ const Users = () => {
     const onHideDialogCreate = () => {
         setCreateDialog(false)
         setLoadingButton(false)
-        setUser({} as T_User)
-        setStatusUnique({} as Status)
+        setClient({} as T_Client)
 
         reset()
     }
@@ -198,44 +191,43 @@ const Users = () => {
     const onHideDialogUpdate = () => {
         setUpdateDialog(false)
         setLoadingButton(false)
-        setUser({} as T_User)
-        setStatusUnique({} as Status)
+        setClient({} as T_Client)
 
         reset()
     }
 
     const onFilters = _.debounce((item: string) => {
-        var aux = [] as T_User[]
+        var aux = [] as T_Client[]
 
-        auxUsers.map((user) => {
-            var cpf = user?.name ? user?.name.toLowerCase().includes(item.toLowerCase()) : ""
-            var dateCreate = user.created_at?.toString() || ""
+        auxClients.map((client) => {
+            var cpf = client?.name ? client?.name.toLowerCase().includes(item.toLowerCase()) : ""
+            var dateCreate = client.created_at?.toString() || ""
 
             if (
                 cpf ||
-                user.name.toLowerCase().includes(item.toLowerCase()) ||
-                user.email.toLowerCase().includes(item.toLowerCase()) ||
+                client.name.toLowerCase().includes(item.toLowerCase()) ||
+                client.cpf.toLowerCase().includes(item.toLowerCase()) ||
                 convertDateToBrazilianStandard(dateCreate).includes(item)
             ) {
-                aux.push(user)
+                aux.push(client)
             }
         })
 
-        setUsers(aux)
+        setClients(aux)
     }, 300)
 
     const renderCardOrTable = () => {
         if (visualization === "card") {
             return (
                 <S.Container>
-                    {users.map((user, index) => (
+                    {clients.map((client, index) => (
                         <Card
                             key={index}
-                            data={user}
-                            type="users"
-                            setDataUser={setUser}
-                            processDeleteInformationUser={processDeleteInformation}
-                            processUpdateInformationUser={processUpdateInformation}
+                            data={client}
+                            type="clients"
+                            setDataClient={setClient}
+                            processDeleteInformationClient={processDeleteInformation}
+                            processUpdateInformationClient={processUpdateInformation}
                         />
                     ))}
                 </S.Container>
@@ -245,11 +237,11 @@ const Users = () => {
         if (visualization === "table") {
             return (
                 <Table
-                    data={users}
-                    type="users"
-                    setDataUser={setUser}
-                    processDeleteInformationUser={processDeleteInformation}
-                    processUpdateInformationUser={processUpdateInformation}
+                    data={clients}
+                    type="clients"
+                    setDataClient={setClient}
+                    processDeleteInformationClient={processDeleteInformation}
+                    processUpdateInformationClient={processUpdateInformation}
                 />
             )
         }
@@ -260,20 +252,16 @@ const Users = () => {
     }, [])
 
     useEffect(() => {
-        setValue("name", user.name)
-        setValue("email", user.email)
-        setValue("status", user.status)
-
-        if (user.status) {
-            const updateStatus: Status = user.status ? { name: 'Ativo', va: true } : { name: 'Desativado', va: false }
-            setStatusUnique(updateStatus)
-        }
-
-    }, [user])
+        setValue("name", client.name)
+        setValue("cpf", client.cpf)
+        setValue("dob", client.dob)
+        setValue("phone", client.phone)
+        setValue("rg", client.rg)
+    }, [client])
 
     return (
         <>
-            <G.TitlePages>Gerenciar Usuários</G.TitlePages>
+            <G.TitlePages>Gerenciar Clientes</G.TitlePages>
 
             <Filters
                 handleOpenModalFilter={processCreateInformation}
@@ -282,7 +270,7 @@ const Users = () => {
                 managerView={true}
             />
 
-            {users.length > 0 ? (
+            {clients?.length > 0 ? (
                 renderCardOrTable()
             ) : (
                 <S.Container>
@@ -293,7 +281,7 @@ const Users = () => {
             )}
 
             {/* Create */}
-            <Dialog visible={createDialog} onHide={onHideDialogCreate} header="Criação de Usuário" draggable={false}>
+            <Dialog visible={createDialog} onHide={onHideDialogCreate} header="Criação de Cliente" draggable={false}>
                 <S.ContainerDialog>
                     <form onSubmit={handleSubmit(handleCreate)}>
                         <div className="flex flex-column gap-2">
@@ -318,78 +306,84 @@ const Users = () => {
                         <br />
 
                         <div className="flex flex-column gap-2">
-                            {errors.email ? (
-                                <small className="p-error">{errors.email.message}</small>
+                            {errors.cpf ? (
+                                <small className="p-error">{errors.cpf.message}</small>
                             ) : (
-                                <label className={classNames({ "p-error": errors.email }) + " label-input-login"} htmlFor="email">
-                                    Email*
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="cpf">
+                                    CPF*
                                 </label>
                             )}
 
                             <Controller
-                                name="email"
+                                name="cpf"
                                 control={control}
                                 rules={{
-                                    required: "Email é obrigatorio.",
-                                    pattern: {
-                                        value: /\S+@\S+\.\S+/,
-                                        message: "Email com formato invalido",
-                                    },
+                                    required: "CPF é obrigatorio.",
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="email" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextLogin type="cpf" id={field.name} {...field} />}
                             />
                         </div>
 
                         <br />
 
                         <div className="flex flex-column gap-2">
-                            {errors.status ? (
-                                <small className="p-error">{errors.status.message}</small>
+                            {errors.rg ? (
+                                <small className="p-error">{errors.rg.message}</small>
                             ) : (
-                                <label className={classNames({ "p-error": errors.status }) + " label-input-login"} htmlFor="status">
-                                    Status*
-                                </label>
-                            )}
-
-                            <Dropdown
-                                {...register("status", {
-                                    required: "O status é obrigatorio",
-                                })}
-                                style={{ width: "100%" }}
-                                value={statusUnique}
-                                options={status}
-                                onChange={(e) => setStatusUnique(e.value)}
-                                optionLabel="name"
-                                id="status"
-                                placeholder="Selecione um Status"
-                            />
-                        </div>
-
-                        <br />
-
-                        <div className="flex flex-column gap-2">
-                            {errors.password ? (
-                                <small className="p-error">{errors.password.message}</small>
-                            ) : (
-                                <label className={classNames({ "p-error": errors.password }) + " label-input-login"} htmlFor="name">
-                                    Password*
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="rg">
+                                    RG*
                                 </label>
                             )}
 
                             <Controller
-                                name="password"
+                                name="rg"
                                 control={control}
-                                rules={{ required: "Password é obrigatorio." }}
-                                render={({ field, fieldState }) => (
-                                    <S.PasswordLogin
-                                        className={classNames({ "p-invalid": fieldState.invalid })}
-                                        id={field.name}
-                                        {...field}
-                                        autoComplete="current-password"
-                                        feedback={false}
-                                        toggleMask
-                                    />
-                                )}
+                                rules={{
+                                    required: "RG é obrigatorio.",
+                                }}
+                                render={({ field }) => <S.InputTextLogin type="rg" id={field.name} {...field} />}
+                            />
+                        </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.phone ? (
+                                <small className="p-error">{errors.phone.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="phone">
+                                    Telefone*
+                                </label>
+                            )}
+
+                            <Controller
+                                name="phone"
+                                control={control}
+                                rules={{
+                                    required: "Telefone é obrigatorio.",
+                                }}
+                                render={({ field }) => <S.InputTextLogin type="phone" id={field.name} {...field} />}
+                            />
+                        </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.dob ? (
+                                <small className="p-error">{errors.dob.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="dob">
+                                    Data de Nascimento*
+                                </label>
+                            )}
+
+                            <Controller
+                                name="dob"
+                                control={control}
+                                rules={{
+                                    required: "Data de Nascimento é obrigatorio.",
+                                }}
+                                render={({ field }) => <S.InputTextLogin type="dob" id={field.name} {...field} />}
                             />
                         </div>
 
@@ -400,7 +394,7 @@ const Users = () => {
                             <Button
                                 type="submit"
                                 disabled={loadingButton}
-                                label="Salvar Usuário"
+                                label="Salvar Cliente"
                                 severity="success"
                                 icon={loadingButton ? <Loader width="20" height="20" /> : <BsCheck2 />}
                             />
@@ -410,7 +404,7 @@ const Users = () => {
             </Dialog>
 
             {/* Update */}
-            <Dialog visible={updateDialog} onHide={onHideDialogUpdate} header="Edição de usuário" draggable={false}>
+            <Dialog visible={updateDialog} onHide={onHideDialogUpdate} header="Edição de Cliente" draggable={false}>
                 <S.ContainerDialog>
                     <form onSubmit={handleSubmit(handleUpdate)}>
                         <div className="flex flex-column gap-2">
@@ -435,61 +429,95 @@ const Users = () => {
                         <br />
 
                         <div className="flex flex-column gap-2">
-                            {errors.email ? (
-                                <small className="p-error">{errors.email.message}</small>
+                            {errors.cpf ? (
+                                <small className="p-error">{errors.cpf.message}</small>
                             ) : (
-                                <label className={classNames({ "p-error": errors.email }) + " label-input-login"} htmlFor="email">
-                                    Email*
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="cpf">
+                                    CPF*
                                 </label>
                             )}
 
                             <Controller
-                                name="email"
+                                name="cpf"
                                 control={control}
                                 rules={{
-                                    required: "Email é obrigatorio.",
-                                    pattern: {
-                                        value: /\S+@\S+\.\S+/,
-                                        message: "Email com formato invalido",
-                                    },
+                                    required: "CPF é obrigatorio.",
                                 }}
-                                render={({ field }) => <S.InputTextLogin type="email" id={field.name} {...field} />}
+                                render={({ field }) => <S.InputTextLogin type="cpf" id={field.name} {...field} />}
                             />
                         </div>
 
                         <br />
 
                         <div className="flex flex-column gap-2">
-                            {errors.status ? (
-                                <small className="p-error">{errors.status.message}</small>
+                            {errors.rg ? (
+                                <small className="p-error">{errors.rg.message}</small>
                             ) : (
-                                <label className={classNames({ "p-error": errors.status }) + " label-input-login"} htmlFor="status">
-                                    Status*
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="rg">
+                                    RG*
                                 </label>
                             )}
 
-                            <Dropdown
-                                {...register("status", {
-                                    required: "O status é obrigatorio",
-                                })}
-                                style={{ width: "100%" }}
-                                value={statusUnique}
-                                options={status}
-                                onChange={(e) => setStatusUnique(e.value)}
-                                optionLabel="name"
-                                id="status"
-                                placeholder="Selecione um Status"
+                            <Controller
+                                name="rg"
+                                control={control}
+                                rules={{
+                                    required: "RG é obrigatorio.",
+                                }}
+                                render={({ field }) => <S.InputTextLogin type="rg" id={field.name} {...field} />}
+                            />
+                        </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.phone ? (
+                                <small className="p-error">{errors.phone.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="phone">
+                                    Telefone*
+                                </label>
+                            )}
+
+                            <Controller
+                                name="phone"
+                                control={control}
+                                rules={{
+                                    required: "Telefone é obrigatorio.",
+                                }}
+                                render={({ field }) => <S.InputTextLogin type="phone" id={field.name} {...field} />}
+                            />
+                        </div>
+
+                        <br />
+
+                        <div className="flex flex-column gap-2">
+                            {errors.dob ? (
+                                <small className="p-error">{errors.dob.message}</small>
+                            ) : (
+                                <label className={classNames({ "p-error": errors.cpf }) + " label-input-login"} htmlFor="dob">
+                                    Data de Nascimento*
+                                </label>
+                            )}
+
+                            <Controller
+                                name="dob"
+                                control={control}
+                                rules={{
+                                    required: "Data de Nascimento é obrigatorio.",
+                                }}
+                                render={({ field }) => <S.InputTextLogin type="dob" id={field.name} {...field} />}
                             />
                         </div>
 
                         <br />
 
                         <S.ContainerButtons>
-                            <Button type="button" label="Cancelar" severity="danger" onClick={onHideDialogCreate} icon={<BsXLg />} />
+                            <Button type="button" label="Cancelar" severity="danger" onClick={onHideDialogUpdate} icon={<BsXLg />} />
                             <Button
                                 type="submit"
                                 disabled={loadingButton}
-                                label="Salvar Usuário"
+                                label="Salvar Cliente"
                                 severity="success"
                                 icon={loadingButton ? <Loader width="20" height="20" /> : <BsCheck2 />}
                             />
@@ -499,23 +527,23 @@ const Users = () => {
             </Dialog>
 
             {/* Delete */}
-            <Dialog visible={deleteDialog} onHide={onHideDialogDelete} header="Dados do Usuário" draggable={false}>
+            <Dialog visible={deleteDialog} onHide={onHideDialogDelete} header="Dados do Cliente" draggable={false}>
                 <S.ContainerDialog>
                     <form onSubmit={handleDelete}>
                         <div>
                             <S.ContainerData>
                                 <S.Title>Nome: </S.Title>
-                                <S.Description>{user.name}</S.Description>
+                                <S.Description>{client.name}</S.Description>
                             </S.ContainerData>
 
                             <S.ContainerData>
-                                <S.Title>Email: </S.Title>
-                                <S.Description>{user.email}</S.Description>
+                                <S.Title>CPF: </S.Title>
+                                <S.Description>{client.cpf}</S.Description>
                             </S.ContainerData>
 
                             <S.ContainerData>
                                 <S.Title>Data de Criação: </S.Title>
-                                <S.Description>{convertDateToBrazilianStandard(user?.created_at?.toLocaleString() || "")}</S.Description>
+                                <S.Description>{convertDateToBrazilianStandard(client?.created_at?.toLocaleString() || "")}</S.Description>
                             </S.ContainerData>
                         </div>
 
@@ -536,4 +564,4 @@ const Users = () => {
     )
 }
 
-export default memo(Users)
+export default memo(Clients)

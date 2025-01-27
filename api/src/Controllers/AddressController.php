@@ -34,13 +34,10 @@ class AddressController
             // Criar o endereço
             $createdAddress = $this->addressModel->createAddress($client_id, $postal_code, $street, $neighborhood, $locality, $city, $state);
 
-            $response->getBody()->write(json_encode([
-                'message' => 'Address created successfully',
-                'address' => $createdAddress
-            ]));
+            $response->getBody()->write(json_encode($createdAddress));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
     }
@@ -51,7 +48,7 @@ class AddressController
 
         // Verificar se existem endereços
         if (!$addresses) {
-            $response->getBody()->write(json_encode(['error' => 'No addresses found']));
+            $response->getBody()->write(json_encode(['message' => 'No addresses found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -67,7 +64,7 @@ class AddressController
         $addresses = $this->addressModel->getAddressesByClientId($clientId);
 
         if (!$addresses) {
-            $response->getBody()->write(json_encode(['error' => 'No addresses found for this client']));
+            $response->getBody()->write(json_encode(['message' => 'No addresses found for this client']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -81,7 +78,7 @@ class AddressController
         $addresses = $this->addressModel->getAddressById($clientId);
 
         if (!$addresses) {
-            $response->getBody()->write(json_encode(['error' => 'No addresses found for this id']));
+            $response->getBody()->write(json_encode(['message' => 'No addresses found for this id']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -103,8 +100,28 @@ class AddressController
         $state = $data['state'] ?? null;
 
         try {
-            if (empty($postal_code) || empty($street) || empty($neighborhood) || empty($locality) || empty($city) || empty($state)) {
-                throw new \Exception('Missing required fields');
+            // Obter o cliente associado ao endereço
+            $currentAddress = $this->addressModel->getAddressById($id);
+            if (!$currentAddress) {
+                throw new \Exception('Address not found');
+            }
+
+            $clientId = $currentAddress['client_id'];
+
+            // Verificar duplicidade de endereço, ignorando o endereço atual
+            $existingAddress = $this->addressModel->findDuplicateAddressExcludingCurrent(
+                $postal_code,
+                $street,
+                $neighborhood,
+                $locality,
+                $city,
+                $state,
+                $id,
+                $clientId
+            );
+
+            if ($existingAddress) {
+                throw new \Exception('Address already exists for another client');
             }
 
             // Atualizar o endereço
@@ -113,16 +130,15 @@ class AddressController
             // Obter os dados atualizados do endereço
             $updatedAddress = $this->addressModel->getAddressById($id);
 
-            $response->getBody()->write(json_encode([
-                'message' => 'Address updated successfully',
-                'address' => $updatedAddress,
-            ]));
+            $response->getBody()->write(json_encode($updatedAddress));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
     }
+
+
 
     // Excluir endereço
     public function deleteAddress($request, $response, $args)
@@ -131,7 +147,7 @@ class AddressController
         $address = $this->addressModel->getAddressById($id);
 
         if (!$address) {
-            $response->getBody()->write(json_encode(['error' => 'Address not found']));
+            $response->getBody()->write(json_encode(['message' => 'Address not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 

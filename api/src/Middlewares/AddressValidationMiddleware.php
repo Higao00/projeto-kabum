@@ -93,7 +93,7 @@ class AddressValidationMiddleware
     private function errorResponse(string $message): Response
     {
         $response = new \Slim\Psr7\Response();
-        $response->getBody()->write(json_encode(['error' => $message]));
+        $response->getBody()->write(json_encode(['message' => $message]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
 }

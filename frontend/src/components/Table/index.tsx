@@ -1,17 +1,10 @@
 import React, { memo, useContext } from "react"
 
-import Image from "next/image"
 import * as S from "./styles"
 
-import { AuthContext } from "@/contexts/AuthContext"
-
-import { Button } from "primereact/button"
-
-import { formatCPF } from "@/lib/formatCPF"
 import { convertDateToBrazilianStandard } from "@/lib/formatDateBR"
 import { T_CardAndTable } from "@/types/Global/T_CardAndTable"
-import { firstAndLastName } from "@/lib/firstAndLastName"
-import { formatNumberWithSixDecimals } from "@/lib/formatNumberWithSixDecimals"
+
 
 const Table = ({
     type,
@@ -19,89 +12,20 @@ const Table = ({
 
     // user
     setDataUser,
-    setDataItemsMenu,
-    processGroupInformationUser,
     processDeleteInformationUser,
-    processPermissionInformationUser,
     processUpdateInformationUser,
 
-    // group
-    handleRemoveGroup,
-    handleUpdateGroup,
-    handleViewPermissionsGroup,
-
-    // permission
-    handleUpdatePermissions,
-    handleRemovePermissions,
-    handleAddGroupMenu,
-    viewUsers,
-
-    // menu link
-    handleEditMenuLink,
-    handleRemoveMenuLink,
-
-    // menu item
-    handleUpdateItemsMenu,
-    handleRemoveItemsMenu,
-
-    // menu
-    setDataMenu,
-    handleUpdateMenu,
-    handleRemoveMenu,
-
-    // status
-    setDataGeneralStatus,
-    handleUpdateGeneralStatus,
-    handleRemoveGeneralStatus,
-
-    // category
-    setDataCategory,
-    handleUpdateCategory,
-    handleRemoveCategory,
-
-    // standard message
-    setDataStandardMessage,
-    handleUpdateStandardMessage,
-    handleRemoveStandardMessage,
-
-    // term use
-    setDataTermUse,
-    handleRemoveTermUse,
-    handleUpdateTermUse,
-    handleViewTermUse,
-
     // clients
-    setDataClients,
-    handleUpdateClient,
-    handleViewClient,
-    handleViewEquipments,
-    handleLinkUsers,
+    setDataClient,
+    processDeleteInformationClient,
+    processUpdateInformationClient,
 
-    // Equipments
-    setDataEquipment,
-    handleUpdateEquipment,
-    handleRemoveEquipment,
-    handleViewEquipment,
+    // address
+    setDataAddress,
+    processDeleteInformationAddress,
+    processUpdateInformationAddress,
 
-    // Call
-    setDataCall,
-    handleAnswerCall,
-    handleTechnicalDefinitionCall,
-    handleViewEquipmentById,
-
-    // Solicitation
-    setDataSolicitation,
-
-    // serviceOrder
-    setDataServiceOrder,
-    handleViewDetailsById,
-    handleTechnicalDefinitionServiceOrder,
-    handleAlterStatusServiceOrder,
-    handleAnswerServiceOrder,
-    handleAppointmentsServiceOrder,
 }: T_CardAndTable) => {
-    const { user } = useContext(AuthContext)
-
     switch (type) {
         case "users":
             return (
@@ -177,23 +101,33 @@ const Table = ({
 
         case "clients":
             return (
-                <S.Table value={data} scrollable>
+                <S.Table value={data}>
+                    <S.TableColumn
+                        header=""
+                        alignHeader={"left"}
+                        body={(data) => {
+                            return (
+                                <S.ContainerImage>
+                                    <S.ContainerIcons>
+                                        <S.IconBsFillPersonFill />
+                                    </S.ContainerIcons>
+                                </S.ContainerImage>
+                            )
+                        }}
+                    />
+
                     <S.TableColumn field="id" header="ID" alignHeader={"left"} />
-
-                    <S.TableColumn field="idTotvs" header="ID totvs" alignHeader={"left"} />
-
-                    <S.TableColumn field="corporateName" header="Nome Fantasia" alignHeader={"left"} />
-
-                    <S.TableColumn field="contactName" header="Nome Contato" alignHeader={"left"} />
-
-                    <S.TableColumn field="email" header="Email Contato" alignHeader={"left"} />
+                    <S.TableColumn field="name" header="Nome" alignHeader={"left"} />
+                    <S.TableColumn field="cpf" header="CPF" alignHeader={"left"} />
+                    <S.TableColumn field="rg" header="RG" alignHeader={"left"} />
+                    <S.TableColumn field="phone" header="Telefone" alignHeader={"left"} />
+                    <S.TableColumn field="dob" header="Data Nascimento" alignHeader={"left"} />
 
                     <S.TableColumn
                         header="Data Criação"
                         alignHeader={"left"}
-                        style={{ width: "10%" }}
                         body={(data) => {
-                            return <> {convertDateToBrazilianStandard(data?.createdAt)}</>
+                            return <> {convertDateToBrazilianStandard(data?.created_at)}</>
                         }}
                     />
 
@@ -208,35 +142,78 @@ const Table = ({
                                     severity="info"
                                     model={[
                                         {
-                                            label: "Atualizar",
+                                            label: "Editar",
                                             command: () => {
-                                                setDataClients!(data)
-                                                handleUpdateClient!()
-                                            },
-                                        },
-                                        {
-                                            label: "Visualizar",
-                                            command: () => {
-                                                setDataClients!(data)
-                                                handleViewClient!()
-                                            },
-                                        },
-                                        {
-                                            label: "Equipamentos",
-                                            command: () => {
-                                                setDataClients!(data)
-                                                handleViewEquipments!(data)
+                                                setDataClient!(data)
+                                                processUpdateInformationClient!()
                                             },
                                         },
 
                                         {
-                                            label: "Usuários",
-                                            disabled: data.technicianUser?.id !== undefined,
+                                            label: "Remover",
                                             command: () => {
-                                                setDataClients!(data)
-                                                handleLinkUsers!(data)
+                                                setDataClient!(data)
+                                                processDeleteInformationClient!()
+                                            },
+                                        }
+                                    ]}
+                                />
+                            )
+                        }}
+                    ></S.TableColumn>
+                </S.Table>
+            )
+
+        case "address":
+            return (
+                <S.Table value={data}>
+                    <S.TableColumn
+                        header=""
+                        alignHeader={"left"}
+                        body={(data) => {
+                            return (
+                                <S.ContainerImage>
+                                    <S.ContainerIcons>
+                                        <S.IconBsFillPersonFill />
+                                    </S.ContainerIcons>
+                                </S.ContainerImage>
+                            )
+                        }}
+                    />
+
+                    <S.TableColumn field="id" header="ID" alignHeader={"left"} />
+                    <S.TableColumn field="street" header="RUA" alignHeader={"left"} />
+                    <S.TableColumn field="locality" header="Bairro" alignHeader={"left"} />
+                    <S.TableColumn field="city" header="Cidade" alignHeader={"left"} />
+                    <S.TableColumn field="postal_code" header="CEP" alignHeader={"left"} />
+                    <S.TableColumn field="state" header="Estado" alignHeader={"left"} />
+                    <S.TableColumn field="neighborhood" header="Vizinhança" alignHeader={"left"} />
+
+                    <S.TableColumn
+                        header=""
+                        alignHeader={"left"}
+                        style={{ width: "12%" }}
+                        body={(data) => {
+                            return (
+                                <S.SplitButtonExtends
+                                    label="Opções"
+                                    severity="info"
+                                    model={[
+                                        {
+                                            label: "Editar",
+                                            command: () => {
+                                                setDataAddress!(data)
+                                                processUpdateInformationAddress!()
                                             },
                                         },
+
+                                        {
+                                            label: "Remover",
+                                            command: () => {
+                                                setDataAddress!(data)
+                                                processDeleteInformationAddress!()
+                                            },
+                                        }
                                     ]}
                                 />
                             )

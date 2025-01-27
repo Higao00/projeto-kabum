@@ -35,13 +35,10 @@ class ClientController
             // Obter os dados completos do cliente criado
             $fullClientData = $this->clientModel->getClientById($createdClient['id']);
 
-            $response->getBody()->write(json_encode([
-                'message' => 'Client created successfully',
-                'client' => $fullClientData
-            ]));
+            $response->getBody()->write(json_encode($fullClientData));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
     }
@@ -62,7 +59,7 @@ class ClientController
         $client = $this->clientModel->getClientById($id);
 
         if (!$client) {
-            $response->getBody()->write(json_encode(['error' => 'Client not found']));
+            $response->getBody()->write(json_encode(['message' => 'Client not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -85,7 +82,7 @@ class ClientController
         $client = $this->clientModel->getClientById($id);
 
         if (!$client) {
-            $response->getBody()->write(json_encode(['error' => 'Client not found']));
+            $response->getBody()->write(json_encode(['message' => 'Client not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -96,13 +93,10 @@ class ClientController
             // Buscar os dados atualizados do cliente
             $updatedClient = $this->clientModel->getClientById($id);
 
-            $response->getBody()->write(json_encode([
-                'message' => 'Client updated successfully',
-                'client' => $updatedClient,
-            ]));
+            $response->getBody()->write(json_encode($updatedClient));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
     }
@@ -114,7 +108,7 @@ class ClientController
         $client = $this->clientModel->getClientById($id);
 
         if (!$client) {
-            $response->getBody()->write(json_encode(['error' => 'Client not found']));
+            $response->getBody()->write(json_encode(['message' => 'Client not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 

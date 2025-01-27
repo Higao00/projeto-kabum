@@ -4,16 +4,16 @@ import { parseCookies } from "nookies"
 
 import Layout from "@/components/layouts/layout"
 import Head from "next/head"
-import Users from "@/components/Pages/Users"
+import Clients from "@/components/Pages/Clients"
 
-export default function UsersPage() {
+export default function ClientsPage() {
     return (
         <Layout>
             <Head>
-                <title>Usuários | Projeto Kabum</title>
+                <title>Clientes | Projeto Kabum</title>
             </Head>
 
-            <Users />
+            <Clients />
         </Layout>
     )
 }

@@ -1,19 +1,18 @@
 import { GetServerSideProps } from "next"
 import { parseCookies } from "nookies"
 
-
 import Layout from "@/components/layouts/layout"
 import Head from "next/head"
-import Users from "@/components/Pages/Users"
+import Address from "@/components/Pages/Address"
 
-export default function UsersPage() {
+export default function AddressPage() {
     return (
         <Layout>
             <Head>
-                <title>Usuários | Projeto Kabum</title>
+                <title>Endereços | Projeto Kabum</title>
             </Head>
 
-            <Users />
+            <Address />
         </Layout>
     )
 }

@@ -17,7 +17,7 @@ class ValidationMiddleware
 
         foreach ($this->fields as $field) {
             if (empty($data[$field])) {
-                return $response->withJson(['error' => "Field '$field' is required"], 400);
+                return $response->withJson(['message' => "Field '$field' is required"], 400);
             }
         }
 

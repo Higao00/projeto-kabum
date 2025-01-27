@@ -33,7 +33,7 @@ class UserController
             $response->getBody()->write(json_encode($createdUser));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
     }
@@ -48,7 +48,7 @@ class UserController
 
         // Validação inicial: Verificar se os campos obrigatórios estão presentes
         if (empty($email) || empty($password)) {
-            $response->getBody()->write(json_encode(['error' => 'Email and password are required']));
+            $response->getBody()->write(json_encode(['message' => 'Email and password are required']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
@@ -57,7 +57,7 @@ class UserController
 
         // Verifica se o usuário não existe ou a senha não é válida
         if (!$user || !password_verify($password, $user['password'])) {
-            $response->getBody()->write(json_encode(['error' => 'Invalid credentials']));
+            $response->getBody()->write(json_encode(['message' => 'Invalid credentials']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
@@ -111,7 +111,7 @@ class UserController
         $user = $this->userModel->getUserById($id);
 
         if (!$user) {
-            $response->getBody()->write(json_encode(['error' => 'User not found']));
+            $response->getBody()->write(json_encode(['message' => 'User not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -139,7 +139,7 @@ class UserController
 
         // Impedir alterações no admin (ID 1)
         if ($id == 1) {
-            $response->getBody()->write(json_encode(['error' => 'It is not possible to change the admin']));
+            $response->getBody()->write(json_encode(['message' => 'It is not possible to change the admin']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
@@ -147,7 +147,7 @@ class UserController
         $user = $this->userModel->getUserById($id);
 
         if (!$user) {
-            $response->getBody()->write(json_encode(['error' => 'User not found']));
+            $response->getBody()->write(json_encode(['message' => 'User not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
@@ -165,7 +165,7 @@ class UserController
 
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
-    
+
     // Excluir usuário
     public function deleteUser($request, $response, $args)
     {
@@ -173,12 +173,12 @@ class UserController
         $user = $this->userModel->getUserById($id);
 
         if ($id == 1) {
-            $response->getBody()->write(json_encode(['error' => 'Unable to remove admin']));
+            $response->getBody()->write(json_encode(['message' => 'Unable to remove admin']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
         if (!$user) {
-            $response->getBody()->write(json_encode(['error' => 'User not found']));
+            $response->getBody()->write(json_encode(['message' => 'User not found']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 

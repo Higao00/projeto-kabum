@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Config\Database;
+use PDO;
 
 class ModelsAddress
 {
@@ -48,8 +49,7 @@ class ModelsAddress
             // Inserir o endereço no banco de dados
             $stmt = $this->pdo->prepare("
             INSERT INTO addresses (client_id, postal_code, street, neighborhood, locality, city, state) 
-            VALUES (:client_id, :postal_code, :street, :neighborhood, :locality, :city, :state)
-        ");
+            VALUES (:client_id, :postal_code, :street, :neighborhood, :locality, :city, :state)");
 
             $stmt->execute([
                 'client_id' => $client_id,
@@ -61,23 +61,13 @@ class ModelsAddress
                 'state' => $state
             ]);
 
-            // Confirmar a transação
-            $this->pdo->commit();
-
-            // Obter o ID do endereço inserido
             $addressId = $this->pdo->lastInsertId();
 
-            // Retornar os dados do endereço inserido
-            return [
-                'id' => $addressId,
-                'client_id' => $client_id,
-                'postal_code' => $postal_code,
-                'street' => $street,
-                'neighborhood' => $neighborhood,
-                'locality' => $locality,
-                'city' => $city,
-                'state' => $state
-            ];
+            $stmt = $this->pdo->prepare("SELECT * FROM addresses WHERE id = :id");
+            $stmt->execute(['id' => $addressId]);
+            $address = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $address;
         } catch (\Exception $e) {
             // Reverter a transação em caso de erro
             $this->pdo->rollBack();
@@ -111,19 +101,6 @@ class ModelsAddress
 
     public function updateAddress($id, $postal_code, $street, $neighborhood, $locality, $city, $state)
     {
-
-        // Verificar se o endereço já está cadastrado para o cliente
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM addresses WHERE id = :id AND postal_code = :postal_code AND street = :street");
-        $stmt->execute([
-            'id' => $id,
-            'postal_code' => $postal_code,
-            'street' => $street
-        ]);
-        $addressExists = $stmt->fetchColumn();
-
-        if ($addressExists) {
-            throw new \Exception("The address with postal code '$postal_code' and street '$street' is already registered for this client.");
-        }
         $sql = "UPDATE addresses SET postal_code = ?, street = ?, neighborhood = ?, locality = ?, city = ?, state = ? WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$postal_code, $street, $neighborhood, $locality, $city, $state, $id]);
@@ -134,5 +111,34 @@ class ModelsAddress
         $sql = "DELETE FROM addresses WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
+    }
+
+    public function findDuplicateAddressExcludingCurrent($postal_code, $street, $neighborhood, $locality, $city, $state, $currentAddressId, $clientId)
+    {
+        $query = "
+        SELECT * 
+        FROM addresses 
+        WHERE postal_code = :postal_code 
+          AND street = :street 
+          AND neighborhood = :neighborhood 
+          AND locality = :locality 
+          AND city = :city 
+          AND state = :state
+          AND id != :current_address_id
+          AND client_id != :client_id
+        LIMIT 1";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':postal_code', $postal_code);
+        $stmt->bindParam(':street', $street);
+        $stmt->bindParam(':neighborhood', $neighborhood);
+        $stmt->bindParam(':locality', $locality);
+        $stmt->bindParam(':city', $city);
+        $stmt->bindParam(':state', $state);
+        $stmt->bindParam(':current_address_id', $currentAddressId);
+        $stmt->bindParam(':client_id', $clientId);
+        $stmt->execute();
+
+        return $stmt->fetch();
     }
 }

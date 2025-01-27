@@ -1,10 +1,6 @@
 import React, { memo, useContext } from "react"
 
-import Image from "next/image"
 import * as S from "./styles"
-
-import { AuthContext } from "@/contexts/AuthContext"
-
 import { Button } from "primereact/button"
 
 import { T_CardAndTable } from "@/types/Global/T_CardAndTable"
@@ -23,16 +19,17 @@ const Card = ({
 
 
     // clients
-    setDataClients,
-    handleUpdateClient,
-    handleViewClient,
-    handleViewEquipments,
-    handleLinkUsers,
+    setDataClient,
+    processDeleteInformationClient,
+    processUpdateInformationClient,
+
+    // address
+    setDataAddress,
+    processDeleteInformationAddress,
+    processUpdateInformationAddress,
 
 
 }: T_CardAndTable) => {
-    const { user } = useContext(AuthContext)
-
     switch (type) {
         case "users":
             return (
@@ -41,13 +38,9 @@ const Card = ({
                         <S.TopCard>
                             <S.FlagStatus padding="0.2rem 1rem 0.2rem 3.8rem">
                                 <S.ContainerImage>
-                                    {data.avatar_url ? (
-                                        <Image src={data.avatar_url} width={60} height={60} alt={`Imagem do usuário ${data.name}`} />
-                                    ) : (
-                                        <S.ContainerIcons>
-                                            <S.IconBsFillPersonFill />
-                                        </S.ContainerIcons>
-                                    )}
+                                    <S.ContainerIcons>
+                                        <S.IconBsFillPersonFill />
+                                    </S.ContainerIcons>
                                 </S.ContainerImage>
 
                                 <S.Title>{firstAndLastName(data.name)}</S.Title>
@@ -75,7 +68,7 @@ const Card = ({
                             <Button
                                 label="Editar"
                                 severity="info"
-                                disabled={data.email === "ti@esquadros.com.br"}
+
                                 onClick={() => {
                                     setDataUser!(data)
                                     processUpdateInformationUser!()
@@ -85,7 +78,7 @@ const Card = ({
                             <Button
                                 label="Remover"
                                 severity="danger"
-                                disabled={data.email === "ti@esquadros.com.br"}
+
                                 onClick={() => {
                                     setDataUser!(data)
                                     processDeleteInformationUser!()
@@ -99,69 +92,123 @@ const Card = ({
         case "clients":
             return (
                 <S.Container>
-                    <S.Card minHeight="220px">
+                    <S.Card>
                         <S.TopCard>
-                            <S.FlagStatus>
-                                <S.Title>{firstAndLastName(data.corporateName || "")}</S.Title>
+                            <S.FlagStatus padding="0.2rem 1rem 0.2rem 3.8rem">
+                                <S.ContainerImage>
+                                    <S.ContainerIcons>
+                                        <S.IconBsFillPersonFill />
+                                    </S.ContainerIcons>
+                                </S.ContainerImage>
+
+                                <S.Title>{firstAndLastName(data.name)}</S.Title>
                             </S.FlagStatus>
 
                             <S.FlagNumber>
-                                <S.Title>Nº {data.idTotvs}</S.Title>
+                                <S.Title>Nº {data.id}</S.Title>
                             </S.FlagNumber>
                         </S.TopCard>
 
                         <S.BodyCard>
-                            <S.RightSideBodyCard>Nome Fantasia:</S.RightSideBodyCard>
-                            <S.LeftSideBodyCard>{data.fantasyName}</S.LeftSideBodyCard>
+                            <S.RightSideBodyCard>CPF:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.cpf}</S.LeftSideBodyCard>
 
-                            <S.RightSideBodyCard>Data de criação:</S.RightSideBodyCard>
-                            <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data.createdAt, true)}</S.LeftSideBodyCard>
+                            <S.RightSideBodyCard>RG:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.rg}</S.LeftSideBodyCard>
 
-                            <S.RightSideBodyCard>Data de atualização:</S.RightSideBodyCard>
+                            <S.RightSideBodyCard>Telefone:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.phone}</S.LeftSideBodyCard>
 
-                            <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data.updateAt, true)}</S.LeftSideBodyCard>
+                            <S.RightSideBodyCard>Data de Nascimento:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.dob}</S.LeftSideBodyCard>
+
+                            <S.RightSideBodyCard>Data:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data?.created_at, true)}</S.LeftSideBodyCard>
                         </S.BodyCard>
 
                         <S.BottomCard>
                             <Button
-                                label="Atualizar"
-                                severity="warning"
-                                onClick={() => {
-                                    setDataClients!(data)
-                                    handleUpdateClient!()
-                                }}
-                            />
-
-                            <Button
-                                label="Visualizar"
+                                label="Editar"
                                 severity="info"
                                 onClick={() => {
-                                    setDataClients!(data)
-                                    handleViewClient!()
+                                    setDataClient!(data)
+                                    processUpdateInformationClient!()
                                 }}
                             />
 
                             <Button
-                                label="Equipamento"
-                                severity="help"
+                                label="Remover"
+                                severity="danger"
                                 onClick={() => {
-                                    setDataClients!(data)
-                                    handleViewEquipments!(data)
-                                }}
-                            />
-
-                            <Button
-                                label="Usuários"
-                                severity="secondary"
-                                onClick={() => {
-                                    setDataClients!(data)
-                                    handleLinkUsers!(data)
+                                    setDataClient!(data)
+                                    processDeleteInformationClient!()
                                 }}
                             />
                         </S.BottomCard>
                     </S.Card>
                 </S.Container>
             )
+
+        case "address":
+            return (
+                <S.Container>
+                    <S.Card>
+                        <S.TopCard>
+                            <S.FlagStatus padding="0.2rem 1rem 0.2rem 3.8rem">
+                                <S.ContainerImage>
+                                    <S.ContainerIcons>
+                                        <S.IconBsFillPersonFill />
+                                    </S.ContainerIcons>
+                                </S.ContainerImage>
+
+                                <S.Title>{firstAndLastName(data.city)}</S.Title>
+                            </S.FlagStatus>
+
+                            <S.FlagNumber>
+                                <S.Title>Nº {data.id}</S.Title>
+                            </S.FlagNumber>
+                        </S.TopCard>
+
+                        <S.BodyCard>
+                            <S.RightSideBodyCard>Rua:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.street}</S.LeftSideBodyCard>
+
+                            <S.RightSideBodyCard>Bairro:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.locality}</S.LeftSideBodyCard>
+
+                            <S.RightSideBodyCard>CEP:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.postal_code}</S.LeftSideBodyCard>
+
+                            <S.RightSideBodyCard>Estado:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{data.state}</S.LeftSideBodyCard>
+
+                            <S.RightSideBodyCard>Data:</S.RightSideBodyCard>
+                            <S.LeftSideBodyCard>{convertDateToBrazilianStandard(data?.created_at, true)}</S.LeftSideBodyCard>
+                        </S.BodyCard>
+
+                        <S.BottomCard>
+                            <Button
+                                label="Editar"
+                                severity="info"
+                                onClick={() => {
+                                    setDataAddress!(data)
+                                    processUpdateInformationAddress!()
+                                }}
+                            />
+
+                            <Button
+                                label="Remover"
+                                severity="danger"
+                                onClick={() => {
+                                    setDataAddress!(data)
+                                    processDeleteInformationAddress!()
+                                }}
+                            />
+                        </S.BottomCard>
+                    </S.Card>
+                </S.Container>
+            )
+
 
         default:
             return <h2>Não há dados</h2>

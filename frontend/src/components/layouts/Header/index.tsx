@@ -74,7 +74,7 @@ const Header: React.FC<T_ChangeTheme> = ({ alterMenuSide, menuSide }) => {
                     </S.ContainerSideMenu>
 
                     <S.ContainerSideMenu>
-                        <Link href={"/endereco"} onClickCapture={alterMenuSide}>
+                        <Link href={"/enderecos"} onClickCapture={alterMenuSide}>
                             <S.ContainerLinkSideMenu>
                                 <i className={'pi pi-users'} style={{ fontSize: "1.2rem", color: "#fff" }}></i>
                                 <S.LinkSideMenu>Endereços</S.LinkSideMenu>

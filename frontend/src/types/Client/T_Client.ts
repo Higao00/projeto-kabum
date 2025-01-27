@@ -1,21 +1,11 @@
 export interface T_Client {
-    id: number
-    idTotvs: string
-    corporateName: string
-    fantasyName: string
-    document: string
-    store: string
-    contactName: string
-    phoneNumber: string
-    email: string
-    city: string
-    uf: string
-    zipCode: string
-    neighborhood: string
-    address: string
-    latitude: number
-    longitude: number
+    id?: number;
+    name: string;
+    dob: string;
+    cpf: string;
+    rg: string;
+    phone: string;
 
-    createdAt?: Date | undefined
-    updateAt?: Date | undefined
+    created_at?: Date | undefined;
+    update_at?: Date | undefined;
 }
