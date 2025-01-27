@@ -4,7 +4,8 @@ Este projeto é um painel para gerenciamento de clientes e usuários, desenvolvi
 
 ## Tecnologias Utilizadas
 
--   **PHP** (API com arquitetura MVC)
+-   **PHP** (Back-end)
+-   **NEXTJS** (Front-end)
 -   **MySQL** (Banco de dados relacional)
 -   **Docker** (Contêineres isolados)
 -   **Docker Compose** (Orquestração de contêineres)
