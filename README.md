@@ -25,7 +25,7 @@ git clone https://github.com/Higao00/projeto-kabum.git
 cd projeto-kabum
 ```
 
-### 1. Clone o Repositório
+### 1. Instalação das dependencias
 
 ```bash
 cd projeto-kabum/frontend
