@@ -82,7 +82,7 @@ export const ContainerLoginFirst = styled.div`
 `;
 export const ContainerLoginSecond = styled.div`
     width: 100%;
-    height: 50%;
+    height: 55%;
 
     min-height: 420px;
 
@@ -103,7 +103,7 @@ export const ContainerLoginSecond = styled.div`
     }
 `;
 export const ContainerLogo = styled.div`
-    display: none;
+    /* display: none; */
 
     @media only screen and (min-width: 800px) {
         display: block;
