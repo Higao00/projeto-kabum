@@ -128,10 +128,5 @@ docker exec -it frontend bash
 
 Sinta-se à vontade para contribuir com melhorias para o projeto. Faça um fork, crie uma branch e envie um pull request com suas alterações.
 
-## Licença
-
-Este projeto é licenciado sob a [MIT License](LICENSE).
-
----
 
 Desenvolvido com 💻 e ☕ por Higor Henrique.
